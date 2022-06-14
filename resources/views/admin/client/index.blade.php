@@ -1,14 +1,14 @@
 @extends('adminlte::page')
 
-@section('title', '元請け一覧')
+@section('title', '企業一覧')
 
 @section('content_header')
-    <h1>元請け一覧</h1>
+    <h1>企業一覧</h1>
 @stop
 
 @section('content')
 <div class="form-group mt-15">
-    <button type="button" class="btn btn-primary" onclick="location.href='{{ route('admin.company.edit') }}'">新規登録</button>
+    <button type="button" class="btn btn-primary" onclick="location.href='{{ route('admin.client.edit') }}'">新規登録</button>
 </div>
 
 <div class="container-fluid">
@@ -62,15 +62,15 @@
                             </tr>
                         </thead>
                         <tbody>
-                        @foreach($companies as $company)
+                        @foreach($companies as $client)
                             <tr>
-                                <td>{{ $company->id }}</td>
-                                <td>{{ $company->name }}</td>
-                                <td>{{ $company->created_at }}</td>
-                                <td>{{ $company->updated_at }}</td>
+                                <td>{{ $client->id }}</td>
+                                <td>{{ $client->name }}</td>
+                                <td>{{ $client->created_at }}</td>
+                                <td>{{ $client->updated_at }}</td>
                                 <td class="text-center">
-                                    <button type="button" class="btn btn-primary" onclick="location.href='{{route('admin.company.edit',['id' => $company->id])}}'">編集</button>
-                                    <button type="button" class="btn btn-danger delete_btn" onclick="deleteData('{{ route('admin.company.destroy',['id' => $company->id]) }}');">削除</button>
+                                    <button type="button" class="btn btn-primary" onclick="location.href='{{route('admin.client.edit',['id' => $client->id])}}'">編集</button>
+                                    <button type="button" class="btn btn-danger delete_btn" onclick="deleteData('{{ route('admin.client.destroy',['id' => $client->id]) }}');">削除</button>
                                 </td>
                             </tr>
                         @endforeach
@@ -106,7 +106,7 @@
 
 @section('js')
 <script src="{{ asset( cacheBusting('js/common.js') ) }}"></script>
-<script src="{{ asset( cacheBusting('js/admin/company.js') ) }}"></script>
+<script src="{{ asset( cacheBusting('js/admin/client.js') ) }}"></script>
 <script>
 
 

@@ -5,7 +5,7 @@ use App\Http\Controllers\Report\FrontReportController;
 
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ReportController;
-use App\Http\Controllers\Admin\CompanyController;
+use App\Http\Controllers\Admin\AdminClientController;
 use App\Http\Controllers\Admin\SiteController;
 use App\Http\Controllers\Admin\WorkerController;
 use App\Http\Controllers\Admin\DeduraController;
@@ -30,7 +30,7 @@ Route::get('/', function () {
 });
 
 // テストサンプル 勤怠入力画面
-Route::get('/kintai', [FrontReportController::class, 'kintai'])->name('kintai');
+//Route::get('/kintai', [FrontReportController::class, 'kintai'])->name('kintai');
 
 // 作業証明書入力画面
 Route::middleware('basicauth')->group(function () {
@@ -40,12 +40,20 @@ Route::middleware('basicauth')->group(function () {
     Route::post('/report/destroy/{id}', [FrontReportController::class, 'destroy'])->name('report.destroy');
 });
 
-// 管理画面
-Route::middleware('auth')->group(function () {
+
+// 運営管理画面
+Route::middleware('basicauth')->group(function () {
     Route::get('/admin', function () {
         return view('admin/index');
     })->name('admin');
+    Route::match(['get', 'post'], '/admin/client', [AdminClientController::class, 'index'])->name('admin.client.index');
+    Route::get('/admin/client/edit/{id?}', [AdminClientController::class, 'edit'])->name('admin.client.edit');
+    Route::post('/admin/client/update/{id?}', [AdminClientController::class, 'update'])->name('admin.client.update');
+    Route::post('/admin/client/destroy/{id}', [AdminClientController::class, 'destroy'])->name('admin.client.destroy');
+});
 
+// 管理画面
+Route::middleware('auth')->group(function () {
     // 作業証明書
     Route::match(['get', 'post'], '/admin/report', [ReportController::class, 'index'])->name('admin.report.index');
     Route::get('/admin/report/view/{id?}', [ReportController::class, 'view'])->name('admin.report.view');

@@ -24,18 +24,18 @@ class UsersTableSeeder extends Seeder
                 'updated_at' => date('Y-m-d H:i:s'),
             ]
         ]);
-        for ($ix = 2; $ix <= 500; $ix++) {
-            $dispix = sprintf('%03d', $ix);
-            \DB::table('users')->insert([
-                [
-                    'id' => $ix,
-                    'name' => $dispix . '太郎',
-                    'email' => $dispix . '@example.com',
-                    'password' => '',
-                    'created_at' => date('Y-m-d H:i:s'),
-                    'updated_at' => date('Y-m-d H:i:s'),
-                ]
-            ]);
-        }
+        // for ($ix = 2; $ix <= 500; $ix++) {
+        //     $dispix = sprintf('%03d', $ix);
+        //     \DB::table('users')->insert([
+        //         [
+        //             'id' => $ix,
+        //             'name' => $dispix . '太郎',
+        //             'email' => $dispix . '@example.com',
+        //             'password' => '',
+        //             'created_at' => date('Y-m-d H:i:s'),
+        //             'updated_at' => date('Y-m-d H:i:s'),
+        //         ]
+        //     ]);
+        // }
     }
 }

@@ -45,8 +45,8 @@ return [
     |
     */
 
-    'logo' => '大川建設 管理画面',
-    'logo_img' => 'images/logo.ico',
+    'logo' => '勤怠管理システム 管理画面',
+    'logo_img' => 'images/logo.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
@@ -191,6 +191,7 @@ return [
     'dashboard_url' => '#',
     'logout_url' => 'logout',
     'logout_menu' => true,  // カスタマイズ
+    'user_menu' => true,  // カスタマイズ
     'login_url' => 'login',
     'register_url' => '',
     'password_reset_url' => '',
@@ -229,6 +230,11 @@ return [
         // Navbar items:
         ['header' => '業務'],
         [
+            'text' => '企業管理',
+            'url'  => 'admin/client',
+            'icon' => 'fas fa-fw fa-building',
+        ],
+        [
             'text' => '作業証明書',
             'url'  => 'admin/report',
             'icon' => 'fas fa-fw fa-list',
@@ -248,11 +254,6 @@ return [
             'text' => '管理者設定',
             'url'  => 'admin/user',
             'icon' => 'fas fa-fw fa-user',
-        ],
-        [
-            'text' => '元請け管理',
-            'url'  => 'admin/company',
-            'icon' => 'fas fa-fw fa-building',
         ],
         [
             'text' => '作業所管理',

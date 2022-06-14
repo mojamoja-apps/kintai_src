@@ -13,6 +13,8 @@
     @php( $logout_url = $logout_url ? url($logout_url) : '' )
 @endif
 
+
+@if (config('adminlte.user_menu', true))
 <li class="nav-item dropdown user-menu">
 
     {{-- User menu toggler --}}
@@ -84,3 +86,4 @@
     </ul>
 
 </li>
+@endif

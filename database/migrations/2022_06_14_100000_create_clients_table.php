@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('companies', function (Blueprint $table) {
+        Schema::create('clients', function (Blueprint $table) {
             $table->id()->comment('ID');
             $table->string('name')->nullable()->comment('社名');
             $table->string('zip')->nullable()->comment('郵便番号');
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        DB::statement("ALTER TABLE companies COMMENT '元請け企業';");
+        DB::statement("ALTER TABLE clients COMMENT '企業';");
     }
 
     /**

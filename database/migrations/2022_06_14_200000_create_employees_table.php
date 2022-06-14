@@ -13,18 +13,17 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('workers', function (Blueprint $table) {
+        Schema::create('employees', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable()->comment('作業員名');
             $table->string('kana')->nullable()->comment('作業員名かな');
-            $table->integer('style')->unsigned()->nullable()->comment('労働形態 正社員・バイト');
-            $table->integer('belongs')->unsigned()->nullable()->comment('所属会社');
-            $table->boolean('insurance')->nullable()->comment('社会保険ありなし');
+            $table->unsignedBigInteger('client_id')->nullable()->comment('企業ID');
+            $table->foreign('client_id')->references('id')->on('clients')->onUpdate('CASCADE')->onDelete('SET NULL');
             $table->text('memo')->nullable()->comment('メモ');
             $table->timestamps();
         });
 
-        DB::statement("ALTER TABLE sites COMMENT '作業員';");
+        DB::statement("ALTER TABLE employees COMMENT '社員';");
     }
 
     /**
@@ -34,6 +33,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('workers');
+        Schema::dropIfExists('employees');
     }
 };

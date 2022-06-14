@@ -3,15 +3,32 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Company;
+use App\Models\Client;
 use Illuminate\Http\Request;
 
-class CompanyController extends Controller
+class AdminClientController extends Controller
 {
     public $search_session_name;
 
     function __construct() {
-        $this->search_session_name = 'compnay';
+        $this->search_session_name = 'client';
+
+        // 作業証明書入力画面では 管理画面レイアウトを調整する
+        config(['adminlte.title' => '運営管理画面']);
+        config(['adminlte.logo' => '運営管理画面']);
+        // ユーザーメニュー非表示
+        config(['adminlte.user_menu' => false]);
+        // メニュー上書き
+        config(['adminlte.menu' =>
+            [
+                ['header' => '業務'],
+                [
+                    'text' => '企業管理',
+                    'url'  => 'admin/client',
+                    'icon' => 'fas fa-fw fa-building',
+                ],
+            ]
+        ]);
     }
 
     // 一覧
@@ -21,7 +38,7 @@ class CompanyController extends Controller
 
 
 
-        $query = Company::query();
+        $query = Client::query();
 
         //検索
         $method = $request->method();
@@ -77,19 +94,19 @@ class CompanyController extends Controller
         $companies = $query->orderBy('updated_at', 'desc')->get();
 
 
-        return view('admin/company/index', compact('companies', 'search', 'collapse'));
+        return view('admin/client/index', compact('companies', 'search', 'collapse'));
     }
 
     // 登録・編集
     public function edit($id = null) {
         if ($id == null) {
             $mode = config('const.editmode.create');
-            $company = New Company; //新規なので空のインスタンスを渡す
+            $client = New Client; //新規なので空のインスタンスを渡す
         } else {
             $mode = config('const.editmode.edit');
-            $company = Company::find($id);
+            $client = Client::find($id);
         }
-        return view('admin/company/edit', compact('company', 'mode'));
+        return view('admin/client/edit', compact('client', 'mode'));
     }
 
     // 更新処理
@@ -112,7 +129,7 @@ class CompanyController extends Controller
             'memo' => $request->input('memo'),
         ];
 
-        Company::updateOrCreate(
+        Client::updateOrCreate(
             ['id' => $id],
             $updarr,
         );
@@ -120,16 +137,16 @@ class CompanyController extends Controller
         // CSRFトークンを再生成して、二重送信対策
         $request->session()->regenerateToken();
 
-        return redirect( route('admin.company.index') );
+        return redirect( route('admin.client.index') );
     }
 
     public function destroy(Request $request, $id) {
-        $company = Company::find($id);
-        $company->delete();
+        $client = Client::find($id);
+        $client->delete();
 
         // CSRFトークンを再生成して、二重送信対策
         $request->session()->regenerateToken();
 
-        return redirect( route('admin.company.index') );
+        return redirect( route('admin.client.index') );
     }
 }
