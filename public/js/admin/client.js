@@ -14,10 +14,27 @@ $('#edit_form').validate({
         name: {
             required: true,
         },
+        email: {
+            required: true,
+            email: true,
+        },
+        password: {
+            // 新規時は必須
+            required: $("#mode").val() == _MODE_CREATE,
+            minlength: 8
+        },
     },
     messages: {
         name: {
             required: "必須項目です。",
+        },
+        email: {
+            required: "必須項目です。",
+            email: "メールアドレスを入力してください。",
+        },
+        password: {
+            required: "必須項目です。",
+            minlength: "8文字以上で入力してください。"
         },
     },
     errorElement: 'span',

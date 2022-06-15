@@ -53,7 +53,7 @@ Route::middleware('basicauth')->group(function () {
 });
 
 // 管理画面
-Route::middleware('auth')->group(function () {
+Route::middleware( ['auth', 'can:is_enabled'])->group(function () {
     // 作業証明書
     Route::match(['get', 'post'], '/admin/report', [ReportController::class, 'index'])->name('admin.report.index');
     Route::get('/admin/report/view/{id?}', [ReportController::class, 'view'])->name('admin.report.view');

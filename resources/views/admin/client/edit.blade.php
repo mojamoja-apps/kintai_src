@@ -29,6 +29,34 @@
                             <code>{{ $errors->first('name') }}</code>
                             @endif
                         </div>
+                        <div class="form-group">
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="is_enabled" name="is_enabled" value="1"
+                                    @if ((int)old('is_enabled') == 1) checked
+                                    @elseif ($client->is_enabled == 1) checked
+                                    @elseif ($mode == config('const.editmode.create')) checked
+                                    @endif
+                                >
+                                    <label class="custom-control-label" for="is_enabled">有効</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">メールアドレス(ログインID)</label>
+                            <input type="text" class="form-control" name="email" id="email" placeholder="yamada@example.com" value="{{ old('email', $client->email) }}">
+                            @if ($errors->has('email'))
+                            <code>{{ $errors->first('email') }}</code>
+                            @endif
+                        </div>
+                        <div class="form-group">
+                            <label for="password">パスワード</label>
+                            <input type="text" class="form-control" name="password" id="password" placeholder="Password" value="">
+                            @if ($mode == config('const.editmode.edit'))
+                            <p><code>変更する時のみ入力してください。</code></p>
+                            @endif
+                            @if ($errors->has('password'))
+                            <code>{{ $errors->first('password') }}</code>
+                            @endif
+                        </div>
                         <div class="form-group h-adr">
                             <span class="p-country-name" style="display:none;">Japan</span>
                             <label for="name">住所</label>
@@ -101,9 +129,7 @@
 @stop
 
 @section('css')
-    {{-- ページごとCSSの指定
-    <link rel="stylesheet" href="/css/xxx.css">
-    --}}
+<link rel="stylesheet" href="{{ asset( cacheBusting('css/common.css') ) }}">
 @stop
 
 @section('js')

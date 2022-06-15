@@ -133,6 +133,7 @@
 
 @section('css')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/base/jquery-ui.min.css">
+<link rel="stylesheet" href="{{ asset( cacheBusting('css/common.css') ) }}">
 @stop
 
 @section('js')

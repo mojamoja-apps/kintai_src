@@ -67,9 +67,7 @@
 @stop
 
 @section('css')
-    {{-- ページごとCSSの指定
-    <link rel="stylesheet" href="/css/xxx.css">
-    --}}
+<link rel="stylesheet" href="{{ asset( cacheBusting('css/common.css') ) }}">
 @stop
 
 @section('js')

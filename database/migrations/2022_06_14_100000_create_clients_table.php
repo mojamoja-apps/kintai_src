@@ -15,7 +15,11 @@ return new class extends Migration
     {
         Schema::create('clients', function (Blueprint $table) {
             $table->id()->comment('ID');
+            $table->boolean('is_enabled')->default(false)->comment('有効無効');
             $table->string('name')->nullable()->comment('社名');
+            $table->string('email')->unique()->comment('メールアドレス');
+            $table->string('password');
+            $table->rememberToken();
             $table->string('zip')->nullable()->comment('郵便番号');
             $table->string('pref')->nullable()->comment('都道府県');
             $table->string('address1')->nullable()->comment('市区町村');

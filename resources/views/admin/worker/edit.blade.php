@@ -114,6 +114,7 @@
 @stop
 
 @section('css')
+<link rel="stylesheet" href="{{ asset( cacheBusting('css/common.css') ) }}">
 @stop
 
 @section('js')

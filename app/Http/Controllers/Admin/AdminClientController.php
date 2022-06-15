@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Client;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 
 class AdminClientController extends Controller
@@ -76,6 +77,7 @@ class AdminClientController extends Controller
             // 単語をループで回し、ユーザーネームと部分一致するものがあれば、$queryとして保持される
             foreach($wordArraySearched as $value) {
                 $query->where('name', 'like', '%'.$value.'%')
+                    ->OrWhere('email', 'like', '%'.$value.'%')
                     ->OrWhere('zip', 'like', '%'.$value.'%')
                     ->OrWhere('pref', 'like', '%'.$value.'%')
                     ->OrWhere('address1', 'like', '%'.$value.'%')
@@ -111,16 +113,42 @@ class AdminClientController extends Controller
 
     // 更新処理
     public function update(Request $request, $id = null) {
-        $request->validate([
-            'name' => 'required|max:100',
-        ]
-        ,[
-            'name.required' => 'お名前は必須項目です。',
-        ]);
+        if ($request->input('mode') == config('const.editmode.create')) {
+            $request->validate([
+                'name' => 'required',
+                'email' => 'required|email|max:100|unique:clients,email',
+                'password' => 'required|min:8|max:50',
+            ]
+            ,[
+                'name.required' => '会社名は必須項目です。',
+                'email.required' => 'ログインIDは必須項目です。',
+                'email.unique' => 'このログインIDは登録されています。',
+                'password.required' => 'パスワードは必須項目です。',
+                'password.min' => 'パスワードは8文字以上で入力してください。',
+            ]);
+        } else {
+            $request->validate([
+                'name' => 'required|max:100',
+                'email' => 'required|email|max:100|unique:clients,email,' . $id . ',id',
+                'password' => 'nullable|min:8|max:50',
+            ]
+            ,[
+                'name.required' => '会社名は必須項目です。',
+                'email.required' => 'ログインIDは必須項目です。',
+                'email.unique' => 'このログインIDは登録されています。',
+            ]);
+        }
 
         // 更新対象データ
+
+        $is_enabled = 0;
+        if ($request->input('is_enabled')) {
+            $is_enabled = 1;
+        }
         $updarr = [
             'name' => $request->input('name'),
+            'is_enabled' => $is_enabled,
+            'email' => $request->input('email'),
             'zip' => $request->input('zip'),
             'pref' => $request->input('pref'),
             'address1' => $request->input('address1'),
@@ -128,6 +156,10 @@ class AdminClientController extends Controller
             'tel' => $request->input('tel'),
             'memo' => $request->input('memo'),
         ];
+        // パスワードの入力がある場合は更新対象に含める
+        if ($request->input('password') !== null) {
+            $updarr['password'] = Hash::make( $request->input('password') );
+        }
 
         Client::updateOrCreate(
             ['id' => $id],

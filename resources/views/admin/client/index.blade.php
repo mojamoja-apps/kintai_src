@@ -55,7 +55,9 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
+                                <th>状態</th>
                                 <th>社名</th>
+                                <th>メールアドレス</th>
                                 <th>登録日時</th>
                                 <th>更新日時</th>
                                 <th></th>
@@ -65,7 +67,9 @@
                         @foreach($companies as $client)
                             <tr>
                                 <td>{{ $client->id }}</td>
+                                <td>@if ($client->is_enabled == 1) <span class="text-primary">有効</span> @else <span class="text-danger">無効</span> @endif</td>
                                 <td>{{ $client->name }}</td>
+                                <td>{{ $client->email }}</td>
                                 <td>{{ $client->created_at }}</td>
                                 <td>{{ $client->updated_at }}</td>
                                 <td class="text-center">
@@ -99,9 +103,7 @@
 
 
 @section('css')
-    {{-- ページごとCSSの指定
-    <link rel="stylesheet" href="/css/xxx.css">
-    --}}
+<link rel="stylesheet" href="{{ asset( cacheBusting('css/common.css') ) }}">
 @stop
 
 @section('js')

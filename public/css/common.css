@@ -2,3 +2,17 @@
 .no-padding {
     padding: 1px !important;
 }
+.no-padding-right {
+    padding-top: 1px !important;
+    padding-bottom: 1px !important;
+    padding-right: 1px !important;
+}
+.no-padding-left {
+    padding-top: 1px !important;
+    padding-bottom: 1px !important;
+    padding-left: 1px !important;
+}
+
+.brand-link img {
+    background-color: #fff;
+}
