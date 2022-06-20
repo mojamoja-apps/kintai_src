@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'title' => '大川建設 管理画面',
+    'title' => '勤怠管理システム 管理画面',
     'title_prefix' => '',
     'title_postfix' => '',
 
@@ -45,7 +45,7 @@ return [
     |
     */
 
-    'logo' => '勤怠管理システム 管理画面',
+    'logo' => '勤怠管理',
     'logo_img' => 'images/logo.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
@@ -228,49 +228,24 @@ return [
 
     'menu' => [
         // Navbar items:
-        ['header' => '業務'],
-        [
-            'text' => '企業管理',
-            'url'  => 'admin/client',
-            'icon' => 'fas fa-fw fa-building',
-        ],
-        [
-            'text' => '作業証明書',
-            'url'  => 'admin/report',
-            'icon' => 'fas fa-fw fa-list',
-        ],
-        [
-            'text' => '出面集計表',
-            'url'  => 'admin/dedura',
-            'icon' => 'fas fa-fw fa-file-excel',
-        ],
-        [
-            'text' => '勤怠管理表',
-            'url'  => 'admin/kintai',
-            'icon' => 'fas fa-fw fa-file-excel',
-        ],
         ['header' => 'マスター設定'],
         [
-            'text' => '管理者設定',
-            'url'  => 'admin/user',
+            'text' => '社員管理',
+            'url'  => 'client/employee',
             'icon' => 'fas fa-fw fa-user',
         ],
+        ['header' => '業務'],
         [
-            'text' => '作業所管理',
-            'url'  => 'admin/site',
-            'icon' => 'fas fa-fw fa-hammer',
+            'text' => '勤怠管理',
+            'url'  => 'client/kintai',
+            'icon' => 'fas fa-fw fa-clock',
         ],
-        [
-            'text' => '作業員管理',
-            'url'  => 'admin/worker',
-            'icon' => 'fas fa-fw fa-hard-hat',
-        ],
-        ['header' => '　'],
         [
             'text' => '作業証明書入力画面',
-            'url'  => 'report',
+            'url'  => '',
             'icon' => 'fas fa-fw fa-external-link-alt',
             'target' => '_blank',
+            'id'  => 'kintai_link',
         ],
     ],
 

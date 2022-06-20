@@ -28,6 +28,14 @@ $('#edit_form').validate({
             minlength: 8,
             maxlength: 32,
         },
+        basic_user: {
+            required: true,
+            maxlength: 10,
+        },
+        basic_pass: {
+            required: true,
+            maxlength: 10,
+        },
     },
     messages: {
         name: {
@@ -45,6 +53,14 @@ $('#edit_form').validate({
             required: "必須項目です。",
             minlength: "8文字以上で入力してください。",
             maxlength: "32文字以下で入力してください。",
+        },
+        basic_user: {
+            required: "必須項目です。",
+            maxlength: "8文字以下で入力してください。",
+        },
+        basic_pass: {
+            required: "必須項目です。",
+            maxlength: "8文字以下で入力してください。",
         },
     },
     errorElement: 'span',

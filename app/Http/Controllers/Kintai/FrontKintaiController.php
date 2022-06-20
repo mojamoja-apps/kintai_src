@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\Site;
 use App\Models\Employee;
 use App\Services\ClientService;
+use App\Services\EmployeeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -48,12 +49,23 @@ class FrontKintaiController extends Controller
 
         // ハッシュを元にクライアントを検索
         $clientService = New ClientService();
-        $client = $clientService->findByHash($hash);
+        $client = $clientService->findClientByHash($hash);
+        if ($client == null) {
+            return \App::abort(404);
+        }
 //ddd($client);
-//fn_basic_auth(array('aaa' => 'bbb'));
+
+        // basic認証
+        fn_basic_auth(array($client->basic_user => $client->basic_pass));
+
+        // クライアントIDを元に社員一覧
+        $employeeService = New EmployeeService();
+        $employees = $employeeService->findEmployeesByClientId($client->id);
+//ddd($employees);
+        // 社員マスタ取得
         config(['adminlte.title' => '']);
         config(['adminlte.logo' => '']);
-        return view('kintai.index');
+        return view('kintai.index', compact('client', 'employees'));
 ///////////////////////////////////////////////////////////
 
         $query = Report::query();

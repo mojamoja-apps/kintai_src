@@ -27,6 +27,10 @@ return new class extends Migration
             $table->string('tel')->nullable()->comment('電話番号');
             $table->text('memo')->nullable()->comment('メモ');
             $table->string('hash')->comment('クライアントごとにユニークなハッシュ値 URL用)');
+            $table->string('basic_user')->nullable()->comment('Basic認証 ユーザー');
+            $table->string('basic_pass')->nullable()->comment('Basic認証 パスワード');
+            $table->boolean('gps')->default(false)->comment('GPS機能有効無効');
+            $table->integer('rest')->unsigned()->nullable()->default(1)->comment('1：休憩なし 2：休憩1あり 3：休憩2あり');
             $table->timestamps();
         });
 

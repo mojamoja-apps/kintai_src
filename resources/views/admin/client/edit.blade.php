@@ -10,15 +10,16 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-6">
-            <div class="card card-primary">
-
-                @if ($mode == config('const.editmode.create'))
-                {{Form::open(['method'=>'post', 'id'=>'edit_form', 'route' => 'admin.client.update'])}}
-                @else
-                {{Form::open(['method'=>'post', 'id'=>'edit_form', 'route' => ['admin.client.update', $client->id] ])}}
-                @endif
-                    <input type="hidden" name="mode" id="mode" value="{{ $mode }}">
-
+            @if ($mode == config('const.editmode.create'))
+            {{Form::open(['method'=>'post', 'id'=>'edit_form', 'route' => 'admin.client.update'])}}
+            @else
+            {{Form::open(['method'=>'post', 'id'=>'edit_form', 'route' => ['admin.client.update', $client->id] ])}}
+            @endif
+            <input type="hidden" name="mode" id="mode" value="{{ $mode }}">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">基本設定</h3>
+                    </div>
 
 
                     <div class="card-body">
@@ -55,15 +56,6 @@
                             @endif
                             @if ($errors->has('password'))
                             <code>{{ $errors->first('password') }}</code>
-                            @endif
-                        </div>
-
-                        <div class="form-group">
-                            <label for="hash">URL用コード</label>
-                            <input type="text" class="form-control" name="hash" id="hash" placeholder="" value="{{ old('hash', $client->hash) }}">
-                            <p><code>自動発行されるので、基本的に変更する必要はありません。</code></p>
-                            @if ($errors->has('hash'))
-                            <code>{{ $errors->first('hash') }}</code>
                             @endif
                         </div>
 
@@ -119,15 +111,80 @@
                             @endif
                         </div>
                     </div>
+                </div>
 
 
+
+
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">勤怠打刻ページ設定</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="hash">URL用コード</label>
+                            <input type="text" class="form-control" name="hash" id="hash" placeholder="" maxlength="32" value="{{ old('hash', $client->hash) }}">
+                            <p><code>自動発行されるので、基本的に変更する必要はありません。</code></p>
+                            @if ($errors->has('hash'))
+                            <code>{{ $errors->first('hash') }}</code>
+                            @endif
+                        </div>
+
+                        <div class="form-group">
+                            <label for="basic_user">Basic認証 ユーザー</label>
+                            <input type="text" class="form-control" name="basic_user" id="basic_user" placeholder="" maxlength="10" value="{{ old('basic_user', $client->basic_user) }}">
+                            @if ($errors->has('basic_user'))
+                            <code>{{ $errors->first('basic_user') }}</code>
+                            @endif
+                        </div>
+
+                        <div class="form-group">
+                            <label for="basic_pass">Basic認証 パスワード</label>
+                            <input type="text" class="form-control" name="basic_pass" id="basic_pass" placeholder="" maxlength="10" value="{{ old('basic_pass', $client->basic_pass) }}">
+                            @if ($errors->has('basic_pass'))
+                            <code>{{ $errors->first('basic_pass') }}</code>
+                            @endif
+                        </div>
+
+                        <div class="form-group">
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="gps" name="gps" value="1"
+                                    @if ((int)old('gps') == 1) checked
+                                    @elseif ($client->gps == 1) checked
+                                    @endif
+                                >
+                                    <label class="custom-control-label" for="gps">GPS機能</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="belongs">休憩</label>
+                            <div class="form-inline">
+                                @foreach (config('const.REST') as $key => $item)
+                                <div class="custom-control custom-radio">
+                                    <input class="custom-control-input" type="radio" name="rest" id="rest_{{$key}}" value="{{$key}}"
+                                    @if ((int)old('rest') == $key) checked
+                                    @elseif ($client->rest == $key) checked
+                                    @elseif ($key == 1 && $client->rest == null) checked
+                                    @endif
+                                    >
+                                    <label for="rest_{{$key}}" class="custom-control-label">{{$item}}　</label>
+                                </div>
+                                @endforeach
+                            </div>
+                            @if ($errors->has('rest'))
+                            <code>{{ $errors->first('rest') }}</code>
+                            @endif
+                        </div>
+
+                    </div>
 
                     <div class="card-footer">
                         <button type="submit" id="commit_btn" class="btn btn-primary">登録</button>
                         <button type="button" id="" class="btn btn-default back_btn float-right" onclick="location.href='{{ route('admin.client.index') }}'">戻る</button>
                     </div>
-                {{ Form::close() }}
-            </div>
+                </div>
+            {{ Form::close() }}
         </div>
     </div>
 </div>

@@ -122,16 +122,22 @@ class AdminClientController extends Controller
                 'email' => 'required|email|max:100|unique:clients,email',
                 'password' => 'required|min:8|max:50',
                 'hash' => 'required|min:8|max:32',
+                'basic_user' => 'required|max:10',
+                'basic_pass' => 'required|max:10',
             ]
             ,[
-                'name.required' => '会社名は必須項目です。',
-                'email.required' => 'ログインIDは必須項目です。',
+                'name.required' => '必須項目です。',
+                'email.required' => '必須項目です。',
                 'email.unique' => 'このログインIDは登録されています。',
-                'password.required' => 'パスワードは必須項目です。',
+                'password.required' => '必須項目です。',
                 'password.min' => 'パスワードは8文字以上で入力してください。',
-                'hash.required' => 'URL用コードは必須項目です。',
+                'hash.required' => '必須項目です。',
                 'hash.min' => 'URL用コードは8文字以上で入力してください。',
                 'hash.max' => 'URL用コードは32文字以下で入力してください。',
+                'basic_user.required' => '必須項目です。',
+                'basic_user.max' => '10文字以下で入力してください。',
+                'basic_pass.required' => '必須項目です。',
+                'basic_pass.max' => '10文字以下で入力してください。',
             ]);
         } else {
             $request->validate([
@@ -139,6 +145,8 @@ class AdminClientController extends Controller
                 'email' => 'required|email|max:100|unique:clients,email,' . $id . ',id',
                 'password' => 'nullable|min:8|max:50',
                 'hash' => 'required|min:8|max:32',
+                'basic_user' => 'required|max:10',
+                'basic_pass' => 'required|max:10',
             ]
             ,[
                 'name.required' => '会社名は必須項目です。',
@@ -147,6 +155,10 @@ class AdminClientController extends Controller
                 'hash.required' => 'URL用コードは必須項目です。',
                 'hash.min' => 'URL用コードは8文字以上で入力してください。',
                 'hash.max' => 'URL用コードは32文字以下で入力してください。',
+                'basic_user.required' => '必須項目です。',
+                'basic_user.max' => '10文字以下で入力してください。',
+                'basic_pass.required' => '必須項目です。',
+                'basic_pass.max' => '10文字以下で入力してください。',
             ]);
         }
 
@@ -155,6 +167,10 @@ class AdminClientController extends Controller
         $is_enabled = 0;
         if ($request->input('is_enabled')) {
             $is_enabled = 1;
+        }
+        $gps = 0;
+        if ($request->input('gps')) {
+            $gps = 1;
         }
         $updarr = [
             'name' => $request->input('name'),
@@ -167,6 +183,10 @@ class AdminClientController extends Controller
             'tel' => $request->input('tel'),
             'memo' => $request->input('memo'),
             'hash' => $request->input('hash'),
+            'basic_user' => $request->input('basic_user'),
+            'basic_pass' => $request->input('basic_pass'),
+            'gps' => $gps,
+            'rest' => $request->input('rest'),
         ];
         // パスワードの入力がある場合は更新対象に含める
         if ($request->input('password') !== null) {

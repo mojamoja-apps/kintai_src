@@ -82,11 +82,6 @@
 
     </form>
 
-        <div class="row mt-3">
-            <div class="col-12">
-                <p style="text-align: center;"><a href="{{route('report.index')}}">作業証明書入力画面はコチラ</a></p>
-            </div>
-        </div>
 @stop
 
 @section('auth_footer')

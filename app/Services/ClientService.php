@@ -8,9 +8,9 @@ class ClientService
 {
 
     /*
-        * ハッシュを元に有効クライアントを検索
+        * ハッシュを元に有効クライアント1つを検索
     */
-    public function findByHash($hash)
+    public function findClientByHash($hash)
     {
         $query = Client::query();
 

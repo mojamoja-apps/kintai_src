@@ -1,30 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
-use App\Models\Worker;
+use App\Models\Employee;
 use Illuminate\Http\Request;
+use Auth;
 
-class WorkerController extends Controller
+class EmployeeController extends Controller
 {
     public $search_session_name;
-    public $style;
-    public $belongs;
-    public $insurance;
 
     function __construct() {
-        $this->search_session_name = 'worker';
-
-        // 雇用形態
-        $this->style = config('const.style');
-        array_unshift($this->style, '選択してください');
-        // 所属
-        $this->belongs = config('const.belongs');
-        array_unshift($this->belongs, '選択してください');
-        // 社会保険
-        $this->insurance = config('const.insurance');
-        array_unshift($this->insurance, '選択してください');
+        $this->search_session_name = 'employee';
     }
 
     // 一覧
@@ -32,7 +20,7 @@ class WorkerController extends Controller
         // cardの開閉 全閉じ状態を初期値 必要に応じてオープン
         $collapse = config('const.COLLAPSE.CLOSE');
 
-        $query = Worker::query();
+        $query = Employee::query();
 
         //検索
         $method = $request->method();
@@ -40,9 +28,6 @@ class WorkerController extends Controller
 
         $search = [];
         $search_keys = [
-            'belongs',
-            'style',
-            'insurance',
             'keyword',
         ];
         foreach ($search_keys as $keyname) {
@@ -65,19 +50,6 @@ class WorkerController extends Controller
 
         $open = false; // 検索ボックスを開くか
 
-        if ($search['belongs']) {
-            $query->where('belongs', $search['belongs']);
-            $open = true;
-        }
-        if ($search['style']) {
-            $query->where('style', $search['style']);
-            $open = true;
-        }
-        if ($search['insurance']) {
-            $query->where('insurance', $search['insurance']);
-            $open = true;
-        }
-
         if ($search['keyword']) {
             // 全角スペースを半角に変換
             $spaceConversion = mb_convert_kana($search['keyword'], 's');
@@ -86,37 +58,34 @@ class WorkerController extends Controller
             // 単語をループで回し、ユーザーネームと部分一致するものがあれば、$queryとして保持される
             foreach($wordArraySearched as $value) {
                 $query->where('name', 'like', '%'.$value.'%')
+                    ->OrWhere('kana', 'like', '%'.$value.'%')
                     ->OrWhere('memo', 'like', '%'.$value.'%')
                 ;
             }
             $open = true;
         }
 
-        $workers = $query->orderBy('updated_at', 'desc')->get();
+        $employees = $query->orderBy('order', 'desc')->orderBy('updated_at', 'desc')->orderBy('id', 'desc')->get();
 
 
         if ($open) {
             $collapse = config('const.COLLAPSE.OPEN');
         }
 
-        $style = $this->style;
-        $belongs = $this->belongs;
-        $insurance = $this->insurance;
-        return view('admin/worker/index', compact('workers', 'search', 'style', 'belongs', 'insurance', 'collapse'));
+        return view('client/employee/index', compact('employees', 'search', 'collapse'));
     }
 
     // 登録・編集
     public function edit($id = null) {
         if ($id == null) {
             $mode = config('const.editmode.create');
-            $worker = New Worker; //新規なので空のインスタンスを渡す
+            $employee = New Employee; //新規なので空のインスタンスを渡す
         } else {
             $mode = config('const.editmode.edit');
-            $worker = Worker::find($id);
+            $employee = Employee::find($id);
         }
 
-        $belongs = $this->belongs;
-        return view('admin/worker/edit', compact('worker', 'mode', 'belongs'));
+        return view('client/employee/edit', compact('employee', 'mode'));
     }
 
     // 更新処理
@@ -124,31 +93,28 @@ class WorkerController extends Controller
         $request->validate([
             'name' => 'required|max:100',
             'kana' => 'required|max:100',
-            'belongs' => 'required',
-            'style' => 'required',
-            'insurance' => 'required',
             'memo' => 'max:5000',
         ]
         ,[
             'name.required' => '氏名は必須項目です。',
             'kana.required' => 'かなは必須項目です。',
-            'belongs.required' => '所属の選択は必須項目です。',
-            'style.required' => '雇用形態の選択は必須項目です。',
-            'insurance.required' => '社会保険の選択は必須項目です。',
             'memo.max' => 'メモは5000文字以下で入力してください。',
         ]);
 
         // 更新対象データ
+        $is_enabled = 0;
+        if ($request->input('is_enabled')) {
+            $is_enabled = 1;
+        }
         $updarr = [
             'name' => $request->input('name'),
             'kana' => $request->input('kana'),
-            'belongs' => $request->input('belongs'),
-            'style' => $request->input('style'),
-            'insurance' => $request->input('insurance'),
             'memo' => $request->input('memo'),
+            'client_id' => Auth::id(),
+            'is_enabled' => $is_enabled,
         ];
 
-        Worker::updateOrCreate(
+        Employee::updateOrCreate(
             ['id' => $id],
             $updarr,
         );
@@ -156,16 +122,16 @@ class WorkerController extends Controller
         // CSRFトークンを再生成して、二重送信対策
         $request->session()->regenerateToken();
 
-        return redirect( route('admin.worker.index') );
+        return redirect( route('client.employee.index') );
     }
 
     public function destroy(Request $request, $id) {
-        $worker = Worker::find($id);
-        $worker->delete();
+        $employee = Employee::find($id);
+        $employee->delete();
 
         // CSRFトークンを再生成して、二重送信対策
         $request->session()->regenerateToken();
 
-        return redirect( route('admin.worker.index') );
+        return redirect( route('client.employee.index') );
     }
 }

@@ -8,12 +8,6 @@ $('#edit_form').validate({
         kana: {
             required: true,
         },
-        belongs: {
-            required: true,
-            min: {
-                param: 1,
-            }
-        },
     },
     messages: {
         name: {
@@ -21,10 +15,6 @@ $('#edit_form').validate({
         },
         kana: {
             required: "必須項目です。",
-        },
-        belongs: {
-            required: "必須項目です。",
-            min: "必須項目です。",
         },
     },
     errorElement: 'span',
