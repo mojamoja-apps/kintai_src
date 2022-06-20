@@ -68,7 +68,11 @@
                             <tr>
                                 <td>{{ $client->id }}</td>
                                 <td>@if ($client->is_enabled == 1) <span class="text-primary">有効</span> @else <span class="text-danger">無効</span> @endif</td>
-                                <td>{{ $client->name }}</td>
+                                <td>
+                                    <a href="{{route('kintai.index',['hash' => $client->hash])}}" target="_blank">
+                                        {{ $client->name }}
+                                    </a>
+                                </td>
                                 <td>{{ $client->email }}</td>
                                 <td>{{ $client->created_at }}</td>
                                 <td>{{ $client->updated_at }}</td>

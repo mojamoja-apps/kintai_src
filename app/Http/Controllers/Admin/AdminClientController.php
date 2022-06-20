@@ -104,6 +104,9 @@ class AdminClientController extends Controller
         if ($id == null) {
             $mode = config('const.editmode.create');
             $client = New Client; //新規なので空のインスタンスを渡す
+
+            //新規時にはハッシュを自動生成する
+            $client->hash = md5(uniqid(mt_rand(), true));
         } else {
             $mode = config('const.editmode.edit');
             $client = Client::find($id);
@@ -118,6 +121,7 @@ class AdminClientController extends Controller
                 'name' => 'required',
                 'email' => 'required|email|max:100|unique:clients,email',
                 'password' => 'required|min:8|max:50',
+                'hash' => 'required|min:8|max:32',
             ]
             ,[
                 'name.required' => '会社名は必須項目です。',
@@ -125,17 +129,24 @@ class AdminClientController extends Controller
                 'email.unique' => 'このログインIDは登録されています。',
                 'password.required' => 'パスワードは必須項目です。',
                 'password.min' => 'パスワードは8文字以上で入力してください。',
+                'hash.required' => 'URL用コードは必須項目です。',
+                'hash.min' => 'URL用コードは8文字以上で入力してください。',
+                'hash.max' => 'URL用コードは32文字以下で入力してください。',
             ]);
         } else {
             $request->validate([
                 'name' => 'required|max:100',
                 'email' => 'required|email|max:100|unique:clients,email,' . $id . ',id',
                 'password' => 'nullable|min:8|max:50',
+                'hash' => 'required|min:8|max:32',
             ]
             ,[
                 'name.required' => '会社名は必須項目です。',
                 'email.required' => 'ログインIDは必須項目です。',
                 'email.unique' => 'このログインIDは登録されています。',
+                'hash.required' => 'URL用コードは必須項目です。',
+                'hash.min' => 'URL用コードは8文字以上で入力してください。',
+                'hash.max' => 'URL用コードは32文字以下で入力してください。',
             ]);
         }
 
@@ -155,6 +166,7 @@ class AdminClientController extends Controller
             'address2' => $request->input('address2'),
             'tel' => $request->input('tel'),
             'memo' => $request->input('memo'),
+            'hash' => $request->input('hash'),
         ];
         // パスワードの入力がある場合は更新対象に含める
         if ($request->input('password') !== null) {

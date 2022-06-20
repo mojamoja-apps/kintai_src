@@ -57,6 +57,16 @@
                             <code>{{ $errors->first('password') }}</code>
                             @endif
                         </div>
+
+                        <div class="form-group">
+                            <label for="hash">URL用コード</label>
+                            <input type="text" class="form-control" name="hash" id="hash" placeholder="" value="{{ old('hash', $client->hash) }}">
+                            <p><code>自動発行されるので、基本的に変更する必要はありません。</code></p>
+                            @if ($errors->has('hash'))
+                            <code>{{ $errors->first('hash') }}</code>
+                            @endif
+                        </div>
+
                         <div class="form-group h-adr">
                             <span class="p-country-name" style="display:none;">Japan</span>
                             <label for="name">住所</label>

@@ -21,7 +21,12 @@ $('#edit_form').validate({
         password: {
             // 新規時は必須
             required: $("#mode").val() == _MODE_CREATE,
-            minlength: 8
+            minlength: 8,
+        },
+        hash: {
+            required: true,
+            minlength: 8,
+            maxlength: 32,
         },
     },
     messages: {
@@ -35,6 +40,11 @@ $('#edit_form').validate({
         password: {
             required: "必須項目です。",
             minlength: "8文字以上で入力してください。"
+        },
+        hash: {
+            required: "必須項目です。",
+            minlength: "8文字以上で入力してください。",
+            maxlength: "32文字以下で入力してください。",
         },
     },
     errorElement: 'span',

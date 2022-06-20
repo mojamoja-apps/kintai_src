@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('address2')->nullable()->comment('町名番地');
             $table->string('tel')->nullable()->comment('電話番号');
             $table->text('memo')->nullable()->comment('メモ');
+            $table->string('hash')->comment('クライアントごとにユニークなハッシュ値 URL用)');
             $table->timestamps();
         });
 

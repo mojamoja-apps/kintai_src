@@ -8,8 +8,8 @@ use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\AdminClientController;
 use App\Http\Controllers\Admin\SiteController;
 use App\Http\Controllers\Admin\WorkerController;
-use App\Http\Controllers\Admin\DeduraController;
-use App\Http\Controllers\Admin\KintaiController;
+
+use App\Http\Controllers\Kintai\FrontKintaiController;
 
 use App\Http\Controllers\Api\ValidateController;
 
@@ -30,7 +30,7 @@ Route::get('/', function () {
 });
 
 // テストサンプル 勤怠入力画面
-//Route::get('/kintai', [FrontReportController::class, 'kintai'])->name('kintai');
+Route::get('/kintai/{hash}', [FrontKintaiController::class, 'index'])->name('kintai.index')->where('hash', '[A-Za-z0-9]+');
 
 // 作業証明書入力画面
 Route::middleware('basicauth')->group(function () {

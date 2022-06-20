@@ -16,11 +16,22 @@ class ClientsTableSeeder extends Seeder
     {
         \DB::table('clients')->insert([
             [
+                'id' => 1,
+                'is_enabled' => true,
+                'name' => 'テスト企業001',
+                'email' => 'sorega.dorohedoro+client001@gmail.com',
+                'password' => '$2y$10$Uce38MwgfgjbTDc66Yvym.3cwvmAVBnnlUqVWJyk4gY63Zrn9E4q.',
+                'hash' => '123456789abc',
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ]
+            ,[
                 'id' => 2,
                 'is_enabled' => false,
-                'name' => 'テスト企業admin',
-                'email' => 'sorega.dorohedoro+002@gmail.com',
+                'name' => '無効企業002',
+                'email' => 'sorega.dorohedoro+client002@gmail.com',
                 'password' => '$2y$10$Uce38MwgfgjbTDc66Yvym.3cwvmAVBnnlUqVWJyk4gY63Zrn9E4q.',
+                'hash' => 'XXX123456789abcXXX',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ]
