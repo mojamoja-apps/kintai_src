@@ -30,6 +30,8 @@ class FrontKintaiController extends Controller
         config(['adminlte.logout_menu' => false]);
         // トップナビレイアウト
         config(['adminlte.layout_topnav' => true]);
+        // ヘッダーメニューなし
+        config(['adminlte.no_header_menu' => true]);
         // メニューを削除
         config(['adminlte.menu' => [] ]);
 
@@ -53,7 +55,6 @@ class FrontKintaiController extends Controller
         if ($client == null) {
             return \App::abort(404);
         }
-//ddd($client);
 
         // basic認証
         fn_basic_auth(array($client->basic_user => $client->basic_pass));
@@ -61,136 +62,14 @@ class FrontKintaiController extends Controller
         // クライアントIDを元に社員一覧
         $employeeService = New EmployeeService();
         $employees = $employeeService->findEmployeesByClientId($client->id);
-//ddd($employees);
+
         // 社員マスタ取得
         config(['adminlte.title' => '']);
         config(['adminlte.logo' => '']);
         return view('kintai.index', compact('client', 'employees'));
-///////////////////////////////////////////////////////////
 
-        $query = Report::query();
-
-        //検索
-        $method = $request->method();
-        $session = $request->session()->get($this->search_session_name);
-
-        $search = [];
-        $search_keys = [
-            'day_st',
-            'day_ed',
-            'client_id',
-            'site_id',
-            'keyword',
-        ];
-        foreach ($search_keys as $keyname) {
-            $search[$keyname] = '';
-            if($method == "POST"){
-                $search[$keyname] = $request->input($keyname) ? $request->input($keyname) : '';
-            } else if($method == "GET") {
-                $search[$keyname] = isset($session[$keyname]) ? $session[$keyname] : '';
-            }
-        }
-
-        // セッションを一旦消して検索値を保存
-        $request->session()->forget($this->search_session_name);
-        $puts = [];
-        foreach ($search_keys as $keyname) {
-            $puts[$keyname] = $search[$keyname];
-        }
-        $request->session()->put($this->search_session_name, $puts);
-
-
-        $open = false; // 検索ボックスを開くか
-
-        if ($search['day_st']) {
-            $query->whereDate('day', '>=', $search['day_st']);
-            $open = true;
-        }
-
-        if ($search['day_ed']) {
-            $query->whereDate('day', '<=', $search['day_ed']);
-            $open = true;
-        }
-
-        if ($search['client_id']) {
-            $query->where('client_id', $search['client_id']);
-            $open = true;
-        }
-
-        if ($search['site_id']) {
-            $query->where('site_id', $search['site_id']);
-            $open = true;
-        }
-
-        if ($search['keyword']) {
-            // 全角スペースを半角に変換
-            $spaceConversion = mb_convert_kana($search['keyword'], 's');
-            // 単語を半角スペースで区切り、配列にする（例："山田 翔" → ["山田", "翔"]）
-            $wordArraySearched = preg_split('/[\s,]+/', $spaceConversion, -1, PREG_SPLIT_NO_EMPTY);
-            // 単語をループで回し、ユーザーネームと部分一致するものがあれば、$queryとして保持される
-            foreach($wordArraySearched as $value) {
-                $query->where('koji_1_memo', 'like', '%'.$value.'%')
-                    ->OrWhere('koji_2_memo', 'like', '%'.$value.'%')
-                    ->OrWhere('koji_3_memo', 'like', '%'.$value.'%')
-                    ->OrWhere('koji_4_memo', 'like', '%'.$value.'%')
-                    ->OrWhere('koji_5_memo', 'like', '%'.$value.'%')
-                ;
-            }
-            $open = true;
-        }
-
-        if ($open) {
-            $collapse = config('const.COLLAPSE.OPEN');
-        }
-
-        $reports = $query->orderBy('day', 'desc')->orderBy('id', 'asc')->limit(
-            config('const.max_get')
-        )->get();
-
-        $clients = $this->clients;
-
-        return view('report/index', compact('reports', 'search', 'collapse', 'clients'));
     }
 
-    public function edit($id = null) {
-
-        // cardの開閉 全閉じ状態を初期値 必要に応じてオープン
-        $collapse = [];
-        $collapse[1] = config('const.COLLAPSE.CLOSE');
-        $collapse[2] = config('const.COLLAPSE.CLOSE');
-        $collapse[3] = config('const.COLLAPSE.CLOSE');
-        $collapse[4] = config('const.COLLAPSE.CLOSE');
-        $collapse[5] = config('const.COLLAPSE.CLOSE');
-        $collapse[98] = false; // 作業員追加ボタン
-        $collapse[99] = config('const.COLLAPSE.CLOSE'); // 99:協力員
-
-        $collapse['tobi1'] = false;
-        $collapse['tobi2'] = false;
-        $collapse['tobi3'] = false;
-        $collapse['tobi4'] = false;
-        $collapse['tobi5'] = false;
-        $collapse['doko1'] = false;
-        $collapse['doko2'] = false;
-        $collapse['doko3'] = false;
-        $collapse['doko4'] = false;
-        $collapse['doko5'] = false;
-
-        if ($id == null) {
-            $mode = config('const.editmode.create');
-            $report = New Report; //新規なので空のインスタンスを渡す
-
-        } else {
-            $mode = config('const.editmode.edit');
-            $report = Report::find($id);
-
-        }
-
-
-        $clients = $this->clients;
-        $employees = $this->employees;
-
-        return view('report/edit', compact('report', 'mode', 'collapse', 'clients', 'employees'));
-    }
 
     public function update(Request $request, $id = null) {
         $request->validate([

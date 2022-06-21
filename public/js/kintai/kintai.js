@@ -1,4 +1,30 @@
 
+var dakokumode = 1;
+// 1：出勤
+// 2：休憩1入
+// 3：休憩1出
+// 4：休憩2入
+// 5：休憩2出
+// 6：退勤
+var dakokutext = '';
+
+// 時計表示
+function set2fig(num) {
+    // 桁数が1桁だったら先頭に0を加えて2桁に調整する
+    var ret;
+    if( num < 10 ) { ret = "0" + num; }
+    else { ret = num; }
+    return ret;
+}
+function showClock() {
+    var nowTime = new Date();
+    var nowHour = set2fig(nowTime.getHours());
+    var nowMin  = set2fig(nowTime.getMinutes());
+    //var nowSec  = set2fig(nowTime.getSeconds());
+    var msg = nowHour + ":" + nowMin;
+    $('#time').html(msg);
+}
+setInterval('showClock()',1000);
 
 
 var Toast = Swal.mixin({
@@ -9,19 +35,25 @@ var Toast = Swal.mixin({
 });
 
 $('.btn').click(function (e) {
+    if ($('#employee').val() == '') {
+        Swal.fire({
+            text: '勤怠打刻するユーザーを選択してください。',
+            icon: 'warning',
+        })
+        return;
+    }
 
+    dakokumode = $(this).data('dakokumode');
+    dakokutext = $(this).text();
     navigator.geolocation.getCurrentPosition(fn_send, fn_error);
-
-
-            //   console.log(position.coords.latitude);
-            // console.log(position.coords.longitude);
 });
 
 function fn_send(position) {
     Swal.fire({
-        title: '山田太郎 さん<br>'
-        + '出勤<br>'
-        + '09:30<br>',
+        title: '以下の内容で打刻します。',
+        html: $('#employee option:selected').text() + ' さん<br>'
+        + dakokutext + '<br>'
+        + $('#time').html() + '<br>',
         icon: 'question',
 
         showCancelButton: true,
@@ -39,7 +71,7 @@ function fn_send(position) {
                 $('#overlay_spin').hide();
                 Toast.fire({
                     icon: 'success',
-                    title: '登録しました！' + position.coords.latitude + position.coords.longitude,
+                    title: '登録しました！' + position.coords.latitude + ' ' + position.coords.longitude,
                 });
             },1000);
         } else {

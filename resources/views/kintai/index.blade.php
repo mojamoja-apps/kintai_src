@@ -12,11 +12,14 @@
         <div class="col-lg-12">
             <div class="card card-default mt-1">
                 <div class="card-header">
-                    <h3 class="card-title">勤怠入力サンプル</h3>
+                    <h3 class="card-title">{{ $client->name }} 勤怠入力</h3>
                 </div>
                 <div class="card-body">
+                    <p class="text-center display-1">
+                        <strong id="time"></strong>
+                    </p>
                     <div class="form-group">
-                        <select class="form-control select2" style="width: 100%;">
+                        <select name="employee" id="employee" class="form-control select2" style="width: 100%;">
                             <option value="" data-sub-search="">氏名・ふりがなで絞込</option>
 @foreach($employees as $employee)
                             <option value="{{$employee->id}}" data-sub-search="{{$employee->kana}}">{{$employee->name}}</option>
@@ -24,10 +27,12 @@
                         </select>
                     </div>
                     <div class="form-group col-lg-12">
-                        <button type="submit" id="commit_btn" class="btn btn-block btn-lg btn-primary">出勤</button>
-                        <button type="submit" id="commit_btn" class="btn btn-block btn-lg btn-success">休憩入</button>
-                        <button type="submit" id="commit_btn" class="btn btn-block btn-lg btn-info">休憩出</button>
-                        <button type="submit" id="commit_btn" class="btn btn-block btn-lg btn-danger">退勤</button>
+                        <button type="button" id="kintai_btn_1" data-dakokumode="1" class="btn btn-block btn-lg btn-primary">出勤</button>
+                        <button type="button" id="kintai_btn_2" data-dakokumode="2" class="btn btn-block btn-lg btn-success">休憩①入</button>
+                        <button type="button" id="kintai_btn_3" data-dakokumode="3" class="btn btn-block btn-lg btn-info">休憩①出</button>
+                        <button type="button" id="kintai_btn_4" data-dakokumode="4" class="btn btn-block btn-lg btn-secondary">休憩②入</button>
+                        <button type="button" id="kintai_btn_5" data-dakokumode="5" class="btn btn-block btn-lg btn-warning">休憩②出</button>
+                        <button type="button" id="kintai_btn_6" data-dakokumode="6" class="btn btn-block btn-lg btn-danger">退勤</button>
                     </div>
                 </div>
                 <div class="overlay dark" id="overlay_spin" style="display: none;">

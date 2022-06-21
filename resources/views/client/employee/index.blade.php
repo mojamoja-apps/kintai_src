@@ -1,17 +1,16 @@
 @extends('adminlte::page')
 
-@section('title', '作業員一覧')
+@section('title', '社員一覧')
 
 @section('content_header')
-    <h1>作業員一覧</h1>
+    <h1>社員一覧</h1>
 @stop
 
 @section('content')
 <div class="form-group mt-15">
     <button type="button" class="btn btn-primary" onclick="location.href='{{ route('client.employee.edit') }}'">新規登録</button>
-    <button type="button" class="btn btn-info" onclick="location.href='{{ route('client.employee.edit') }}'">並び順更新</button>
-    <code>ドラッグ&ドロップで行を並べ替え後、並び順更新ボタンを押してください。mada
-    できてない！！！！！！！！！！！！！！！！！！！</code>
+    <button type="button" class="btn btn-info" onclick="">並び順更新</button>
+    <code>ドラッグ&ドロップで行を並べ替え後、並び順更新ボタンを押してください。</code>
 </div>
 
 
@@ -26,6 +25,7 @@
                     <table id="datatable1" class="table table-bordered table-hover">
                         <thead>
                             <tr>
+                                <th></th>
                                 <th>ID</th>
                                 <th>状態</th>
                                 <th>氏名</th>
@@ -38,6 +38,7 @@
                         <tbody>
                         @foreach($employees as $employee)
                             <tr>
+                                <td class="text-center"><i class="fas fa-bars"></i></td>
                                 <td>{{ $employee->id }}</td>
                                 <td>@if ($employee->is_enabled == 1) <span class="text-primary">有効</span> @else <span class="text-danger">無効</span> @endif</td>
                                 <td>{{ $employee->name }}</td>
@@ -103,10 +104,10 @@ $('#datatable1').DataTable({
     "autoWidth": false,
     "responsive": true,
     "columnDefs": [
-        { responsivePriority: 1, targets: 0 },
+        { responsivePriority: 1, targets: 1 },
         { responsivePriority: 2, targets: -1 },
-        { responsivePriority: 3, targets: 2 },
-        { responsivePriority: 4, targets: 3 },
+        { responsivePriority: 3, targets: 3 },
+        { responsivePriority: 4, targets: 4 },
     ],
 });
 

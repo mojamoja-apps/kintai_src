@@ -190,8 +190,9 @@ return [
     'use_route_url' => false,
     'dashboard_url' => '#',
     'logout_url' => 'logout',
-    'logout_menu' => true,  // カスタマイズ
-    'user_menu' => true,  // カスタマイズ
+    'logout_menu' => true,  // 独自カスタマイズ
+    'user_menu' => true,  // 独自カスタマイズ
+    'no_header_menu' => false,  // 独自カスタマイズ ヘッダーメニューなし
     'login_url' => 'login',
     'register_url' => '',
     'password_reset_url' => '',
