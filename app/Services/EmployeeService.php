@@ -18,6 +18,6 @@ class EmployeeService
             $query->where('client_id', $client_id);
         }
         $query->where('is_enabled', true);
-        return $query->orderBy('order', 'desc')->orderBy('updated_at', 'desc')->orderBy('id', 'desc')->get();
+        return $query->orderBy('order', 'asc')->orderBy('updated_at', 'desc')->orderBy('id', 'desc')->get();
     }
 }

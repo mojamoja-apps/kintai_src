@@ -16,7 +16,7 @@
                 </div>
                 <div class="card-body">
                     <p class="text-center display-1">
-                        <strong id="time"></strong>
+                        <strong id="time">{{ date('H:i'); }}</strong>
                     </p>
                     <div class="form-group">
                         <select name="employee" id="employee" class="form-control select2" style="width: 100%;">

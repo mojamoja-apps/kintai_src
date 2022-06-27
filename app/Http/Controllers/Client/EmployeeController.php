@@ -65,7 +65,7 @@ class EmployeeController extends Controller
             $open = true;
         }
 
-        $employees = $query->orderBy('order', 'desc')->orderBy('updated_at', 'desc')->orderBy('id', 'desc')->get();
+        $employees = $query->orderBy('order', 'asc')->orderBy('updated_at', 'desc')->orderBy('id', 'desc')->get();
 
 
         if ($open) {
@@ -91,14 +91,16 @@ class EmployeeController extends Controller
     // 更新処理
     public function update(Request $request, $id = null) {
         $request->validate([
+            'code' => 'max:8',
             'name' => 'required|max:100',
             'kana' => 'required|max:100',
             'memo' => 'max:5000',
         ]
         ,[
-            'name.required' => '氏名は必須項目です。',
-            'kana.required' => 'かなは必須項目です。',
-            'memo.max' => 'メモは5000文字以下で入力してください。',
+            'code.required' => '8文字以下で入力してください。',
+            'name.required' => '必須項目です。',
+            'kana.required' => '必須項目です。',
+            'memo.max' => '5000文字以下で入力してください。',
         ]);
 
         // 更新対象データ
@@ -107,6 +109,7 @@ class EmployeeController extends Controller
             $is_enabled = 1;
         }
         $updarr = [
+            'code' => $request->input('code'),
             'name' => $request->input('name'),
             'kana' => $request->input('kana'),
             'memo' => $request->input('memo'),
@@ -118,6 +121,24 @@ class EmployeeController extends Controller
             ['id' => $id],
             $updarr,
         );
+
+        // CSRFトークンを再生成して、二重送信対策
+        $request->session()->regenerateToken();
+
+        return redirect( route('client.employee.index') );
+    }
+
+    // 表示順更新処理
+    public function orderupdate(Request $request) {
+
+        foreach ($request->input('ids') as $key => $id) {
+            $updarr = [
+                'order' => $key+1,
+            ];
+
+            Employee::where('id', $id)
+                ->update($updarr);
+        }
 
         // CSRFトークンを再生成して、二重送信対策
         $request->session()->regenerateToken();

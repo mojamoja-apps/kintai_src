@@ -15,11 +15,12 @@ return new class extends Migration
     {
         Schema::create('employees', function (Blueprint $table) {
             $table->id();
-            $table->boolean('is_enabled')->default(false)->comment('有効無効');
-            $table->string('name')->nullable()->comment('作業員名');
-            $table->string('kana')->nullable()->comment('作業員名かな');
             $table->unsignedBigInteger('client_id')->nullable()->comment('企業ID');
             $table->foreign('client_id')->references('id')->on('clients')->onUpdate('CASCADE')->onDelete('SET NULL');
+            $table->boolean('is_enabled')->default(false)->comment('有効無効');
+            $table->string('code')->nullable()->comment('社員コード');
+            $table->string('name')->nullable()->comment('社員名');
+            $table->string('kana')->nullable()->comment('社員名かな');
             $table->text('memo')->nullable()->comment('メモ');
             $table->integer('order')->unsigned()->default(999999)->comment('表示順');
             $table->timestamps();

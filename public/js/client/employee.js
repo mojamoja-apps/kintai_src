@@ -2,6 +2,9 @@
 
 $('#edit_form').validate({
     rules: {
+        code: {
+            alphanum: true,
+        },
         name: {
             required: true,
         },
@@ -10,6 +13,9 @@ $('#edit_form').validate({
         },
     },
     messages: {
+        code: {
+            max: "最大8桁で入力してください。",
+        },
         name: {
             required: "必須項目です。",
         },
@@ -45,6 +51,12 @@ $('#edit_form').validate({
         });
     }
 });
+
+
+// 半角英数チェック
+$.validator.addMethod("alphanum", function(value, element, param) {
+    return this.optional(element) || /[a-zA-Z0-9_]/.test(value);
+}, '半角英数字で入力してください。');
 
 
 // 一覧での削除ボタン action先を指定

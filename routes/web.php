@@ -36,9 +36,7 @@ Route::get('/kintai/{hash}', [FrontKintaiController::class, 'index'])->name('kin
 
 // 運営管理画面
 Route::middleware('basicauth')->group(function () {
-    Route::get('/admin', function () {
-        return view('admin/index');
-    })->name('admin');
+    Route::get('/admin', [AdminClientController::class, 'dashbord'])->name('admin.index');
     Route::match(['get', 'post'], '/admin/client', [AdminClientController::class, 'index'])->name('admin.client.index');
     Route::get('/admin/client/edit/{id?}', [AdminClientController::class, 'edit'])->name('admin.client.edit');
     Route::post('/admin/client/update/{id?}', [AdminClientController::class, 'update'])->name('admin.client.update');
@@ -55,6 +53,7 @@ Route::middleware( ['auth'])->group(function () {
     Route::get('/client/employee/edit/{id?}', [EmployeeController::class, 'edit'])->name('client.employee.edit');
     Route::post('/client/employee/update/{id?}', [EmployeeController::class, 'update'])->name('client.employee.update');
     Route::post('/client/employee/destroy/{id}', [EmployeeController::class, 'destroy'])->name('client.employee.destroy');
+    Route::post('/client/employee/orderupdate', [EmployeeController::class, 'orderupdate'])->name('client.employee.orderupdate');
 });
 
 // API 作業証明書の重複チェック

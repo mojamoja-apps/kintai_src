@@ -9,7 +9,7 @@
 @section('content')
 <div class="form-group mt-15">
     <button type="button" class="btn btn-primary" onclick="location.href='{{ route('client.employee.edit') }}'">新規登録</button>
-    <button type="button" class="btn btn-info" onclick="">並び順更新</button>
+    <button type="button" class="btn btn-info" onclick="$('#order_form').submit();">並び順更新</button>
     <code>ドラッグ&ドロップで行を並べ替え後、並び順更新ボタンを押してください。</code>
 </div>
 
@@ -19,14 +19,14 @@
 
     <div class="row">
         <div class="col-12">
-        {{Form::open(['method'=>'post', 'id'=>'search_form'])}}
+        {{Form::open(['method'=>'post', 'id'=>'order_form',  'route' => 'client.employee.orderupdate'])}}
             <div class="card">
                 <div class="card-body">
                     <table id="datatable1" class="table table-bordered table-hover">
                         <thead>
                             <tr>
-                                <th></th>
-                                <th>ID</th>
+                                <th>表示順</th>
+                                <th>コード</th>
                                 <th>状態</th>
                                 <th>氏名</th>
                                 <th>かな</th>
@@ -38,8 +38,11 @@
                         <tbody>
                         @foreach($employees as $employee)
                             <tr>
-                                <td class="text-center"><i class="fas fa-bars"></i></td>
-                                <td>{{ $employee->id }}</td>
+                                <td class="text-center">
+                                    <i class="fas fa-bars"> {{ $loop->iteration }}</i>
+                                    <input type="hidden" name="ids[]" value="{{ $employee->id }}">
+                                </td>
+                                <td>{{ $employee->code }}</td>
                                 <td>@if ($employee->is_enabled == 1) <span class="text-primary">有効</span> @else <span class="text-danger">無効</span> @endif</td>
                                 <td>{{ $employee->name }}</td>
                                 <td>{{ $employee->kana }}</td>

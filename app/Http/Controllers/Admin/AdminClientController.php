@@ -32,6 +32,12 @@ class AdminClientController extends Controller
         ]);
     }
 
+
+    // ダッシュボード
+    public function dashbord() {
+        return view('admin/index');
+    }
+
     // 一覧
     public function index(Request $request) {
         // cardの開閉 全閉じ状態を初期値 必要に応じてオープン

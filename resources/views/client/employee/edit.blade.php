@@ -23,6 +23,14 @@
 
                     <div class="card-body">
                         <div class="form-group">
+                            <label for="code">社員コード</label>
+                            <input type="text" class="form-control" name="code" id="code" placeholder="ABC12345" maxlength="8" value="{{ old('code', $employee->code) }}">
+                            @if ($errors->has('code'))
+                            <code>{{ $errors->first('code') }}</code>
+                            @endif
+                        </div>
+
+                        <div class="form-group">
                             <label for="name">氏名</label>
                             <input type="text" class="form-control" name="name" id="name" placeholder="山田 太郎" value="{{ old('name', $employee->name) }}">
                             @if ($errors->has('name'))
