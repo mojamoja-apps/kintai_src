@@ -64,16 +64,34 @@ function fn_send(position) {
             // $("#commit_btn").prop("disabled", true);
             // form.submit();
 
-
             // これはテスト
             $('#overlay_spin').show();
-            setTimeout(function(){
-                $('#overlay_spin').hide();
+
+            $.ajax({
+                type: "POST",
+                url: location.href + "/dakoku",
+                data: {
+                    "_token" : CSRF_TOKEN,
+                    "id" : $('#employee').val(),
+                    "dakokumode" : dakokumode,
+                    "lat" : position.coords.latitude,
+                    "lon" : position.coords.longitude,
+                },
+                dataType : "json"
+            }).done(function(data){
                 Toast.fire({
                     icon: 'success',
-                    title: '登録しました！' + position.coords.latitude + ' ' + position.coords.longitude,
+                    title: '登録しました！',
                 });
-            },1000);
+            }).fail(function(XMLHttpRequest, status, e){
+                Swal.fire({
+                    icon: 'error',
+                    title: 'エラーが発生しました！管理者にお問い合わせください。',
+                    text: e,
+                });
+            }).always(function() {
+                $('#overlay_spin').hide();
+            });
         } else {
             return false;
         }

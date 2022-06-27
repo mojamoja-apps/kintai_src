@@ -32,6 +32,7 @@ Route::get('/', function () {
 
 // 勤怠入力画面
 Route::get('/kintai/{hash}', [FrontKintaiController::class, 'index'])->name('kintai.index')->where('hash', '[A-Za-z0-9]+');
+Route::post('/kintai/{hash}/dakoku', [FrontKintaiController::class, 'dakoku'])->name('kintai.dakoku')->where('hash', '[A-Za-z0-9]+');
 
 
 // 運営管理画面

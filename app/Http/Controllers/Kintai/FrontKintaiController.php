@@ -71,25 +71,18 @@ class FrontKintaiController extends Controller
     }
 
 
-    public function update(Request $request, $id = null) {
-        $request->validate([
-            'day' => 'required|date',
-            'client_id' => 'required',
-            'site_id' => 'required',
-        ]
-        ,[
-            'day.required' => '必須項目です。',
-            'day.date' => '有効な日付を指定してください。',
-            'client_id.required' => '必須項目です。',
-            'site_id.required' => '必須項目です。',
-        ]);
+    public function dakoku(Request $request) {
 
-
+        // ハッシュを元にクライアントを検索
+        $clientService = New ClientService();
+        $client = $clientService->findClientByHash($hash);
+        if ($client == null) {
+            return \App::abort(404);
+        }
 
         // 更新対象データ
         $updarr = [
-            'day' => $request->input('day'),
-            'client_id' => $request->input('client_id'),
+            'client_id' => $client->id,
             'site_id' => $request->input('site_id'),
         ];
         for ($ix = 1; $ix <= 5; $ix++) {
