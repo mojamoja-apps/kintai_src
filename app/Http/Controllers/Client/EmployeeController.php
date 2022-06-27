@@ -21,6 +21,7 @@ class EmployeeController extends Controller
         $collapse = config('const.COLLAPSE.CLOSE');
 
         $query = Employee::query();
+        $query->where('client_id', Auth::id());
 
         //検索
         $method = $request->method();
@@ -82,7 +83,7 @@ class EmployeeController extends Controller
             $employee = New Employee; //新規なので空のインスタンスを渡す
         } else {
             $mode = config('const.editmode.edit');
-            $employee = Employee::find($id);
+            $employee = Employee::where('id', $id)->where('client_id', Auth::id())->firstOrFail();
         }
 
         return view('client/employee/edit', compact('employee', 'mode'));
