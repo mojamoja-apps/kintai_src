@@ -178,6 +178,10 @@ class AdminClientController extends Controller
         if ($request->input('gps')) {
             $gps = 1;
         }
+        $midnight = 0;
+        if ($request->input('midnight')) {
+            $midnight = 1;
+        }
         $updarr = [
             'name' => $request->input('name'),
             'is_enabled' => $is_enabled,
@@ -193,6 +197,7 @@ class AdminClientController extends Controller
             'basic_pass' => $request->input('basic_pass'),
             'gps' => $gps,
             'rest' => $request->input('rest'),
+            'midnight' => $midnight,
         ];
         // パスワードの入力がある場合は更新対象に含める
         if ($request->input('password') !== null) {

@@ -31,6 +31,7 @@ return new class extends Migration
             $table->string('basic_pass')->nullable()->comment('Basic認証 パスワード');
             $table->boolean('gps')->default(false)->comment('GPS機能有効無効');
             $table->integer('rest')->unsigned()->nullable()->default(1)->comment('1：休憩なし 2：休憩1あり 3：休憩2あり');
+            $table->boolean('midnight')->default(false)->comment('深夜残業 前日分の退勤として打刻チェックを表示するか');
             $table->timestamps();
         });
 

@@ -6,11 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\Client;
 use App\Models\Site;
 use App\Models\Employee;
+use App\Models\Kintai;
+use App\Models\Kintai_rireki;
 use App\Services\ClientService;
 use App\Services\EmployeeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
+use Carbon\Carbon;
+use App\Services\DatetimeUtility;
 
 class FrontKintaiController extends Controller
 {
@@ -71,7 +75,7 @@ class FrontKintaiController extends Controller
     }
 
 
-    public function dakoku(Request $request) {
+    public function dakoku(Request $request, $hash) {
 
         // ハッシュを元にクライアントを検索
         $clientService = New ClientService();
@@ -80,52 +84,84 @@ class FrontKintaiController extends Controller
             return \App::abort(404);
         }
 
-        // 更新対象データ
-        $updarr = [
-            'client_id' => $client->id,
-            'site_id' => $request->input('site_id'),
-        ];
-        for ($ix = 1; $ix <= 5; $ix++) {
-            $updarr["koji_{$ix}_kbn"] = $request->input("koji_{$ix}_kbn");
-            $updarr["koji_{$ix}_memo"] = $request->input("koji_{$ix}_memo");
-            for ($iy = 1; $iy <= 5; $iy++) {
-                $updarr["koji_{$ix}_tobi_{$iy}_sttime"] = $request->input("koji_{$ix}_tobi_{$iy}_sttime");
-                $updarr["koji_{$ix}_tobi_{$iy}_edtime"] = $request->input("koji_{$ix}_tobi_{$iy}_edtime");
-                $updarr["koji_{$ix}_tobi_{$iy}_num"] = $request->input("koji_{$ix}_tobi_{$iy}_num");
-                $updarr["koji_{$ix}_tobi_{$iy}_sozan"] = $request->input("koji_{$ix}_tobi_{$iy}_sozan");
-                $updarr["koji_{$ix}_doko_{$iy}_sttime"] = $request->input("koji_{$ix}_doko_{$iy}_sttime");
-                $updarr["koji_{$ix}_doko_{$iy}_edtime"] = $request->input("koji_{$ix}_doko_{$iy}_edtime");
-                $updarr["koji_{$ix}_doko_{$iy}_num"] = $request->input("koji_{$ix}_doko_{$iy}_num");
-                $updarr["koji_{$ix}_doko_{$iy}_sozan"] = $request->input("koji_{$ix}_doko_{$iy}_sozan");
-            }
-            $updarr["koji_{$ix}_dasetu"] = $request->input("koji_{$ix}_dasetu");
-            for ($iy = 1; $iy <= 5; $iy++) {
-                $updarr["koji_{$ix}_car_{$iy}_sttime"] = $request->input("koji_{$ix}_car_{$iy}_sttime");
-                $updarr["koji_{$ix}_car_{$iy}_edtime"] = $request->input("koji_{$ix}_car_{$iy}_edtime");
-                $updarr["koji_{$ix}_car_{$iy}_ton"] = $request->input("koji_{$ix}_car_{$iy}_ton");
-                $updarr["koji_{$ix}_car_{$iy}_num"] = $request->input("koji_{$ix}_car_{$iy}_num");
-                $updarr["koji_{$ix}_car_{$iy}_sozan"] = $request->input("koji_{$ix}_car_{$iy}_sozan");
-            }
+        $request->validate([
+            'employee_id' => 'required',
+            'dakokumode' => 'required',
+        ]
+        ,[
+            'employee_id.required' => '打刻ユーザーは必須項目です。',
+            'dakokumode.required' => '打刻モードは必須項目です。',
+        ]);
+
+        // 既存レコード存在チェック
+        $dt = Carbon::now();
+        $day = $dt->format('Y/m/d');
+        $time = $dt->format('h:i:s');
+
+        $kintai = Kintai::
+                    where('client_id', $client->id)
+                    ->where('employee_id', $request->input('employee_id'))
+                    ->where('day', $day)
+                    ->first();
+
+        if ($kintai === null) {
+            // 新規レコード
+            $id = null;
+        } else {
+            // 更新
+            $id = $kintai->id;
         }
 
-        $result = Report::updateOrCreate(
+
+        $target_column = 'time_' . $request->input('dakokumode'); // 1～6
+
+        // 更新対象データ
+        $midnight = 0;
+        if (
+            $request->input('dakokumode') == config('const.dakokumode.taikin')
+            && $request->input('midnight') === 'true'
+        ) {
+            // ajaxの真偽値は文字列として'true' 'false' が来るので注意して判定
+            $midnight = 1;
+        }
+
+        $updarr = [
+            'client_id' => $client->id,
+            'employee_id' => $request->input('employee_id'),
+            'day' => $day,
+            $target_column => $time,
+            'midnight' => $midnight,
+            'lat' => $request->input('lat'),
+            'lon' => $request->input('lon'),
+        ];
+
+        $result = Kintai::updateOrCreate(
             ['id' => $id],
             $updarr,
         );
 
+
+        //打刻履歴テーブルも作る
+        $updarr = [
+            'client_id' => $client->id,
+            'employee_id' => $request->input('employee_id'),
+            'day' => $day,
+            'time' => $time,
+            'midnight' => $midnight,
+            'lat' => $request->input('lat'),
+            'lon' => $request->input('lon'),
+        ];
+        $rireki = Kintai_rireki::create($updarr);
+
         // CSRFトークンを再生成して、二重送信対策
         $request->session()->regenerateToken();
 
-        return redirect( route('report.index') );
+        return response()->json(['result' => true, 'error_code' => '0', 'error_message' => '']);
     }
 
     public function destroy(Request $request, $id) {
         $report = Report::find($id);
         $report->delete();
-
-        // 添付ファイル削除
-        $path = $id . '.png';
-        Storage::disk("public")->delete('sign/' . $path);
 
         // CSRFトークンを再生成して、二重送信対策
         $request->session()->regenerateToken();

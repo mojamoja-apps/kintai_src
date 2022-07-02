@@ -8,6 +8,14 @@ return [
         'destroy' => 'destroy',
     ],
 
+    'dakokumode' => [
+        'syukkin' => 1,
+        'kyuukei_1_st' => 2,
+        'kyuukei_1_ed' => 3,
+        'kyuukei_2_st' => 4,
+        'kyuukei_3_ed' => 5,
+        'taikin' => 6,
+    ],
 
     // 作業証明書 1回での取得件数マックス
     'max_get' => 1000,

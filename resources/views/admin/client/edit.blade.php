@@ -177,6 +177,19 @@
                             @endif
                         </div>
 
+
+                        <div class="form-group">
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="midnight" name="midnight" value="1"
+                                    @if ((int)old('midnight') == 1) checked
+                                    @elseif ($client->midnight == 1) checked
+                                    @elseif ($mode == config('const.editmode.create')) checked
+                                    @endif
+                                >
+                                    <label class="custom-control-label" for="midnight">深夜残業 (前日分の退勤として打刻する チェックを表示)</label>
+                            </div>
+                        </div>
+
                     </div>
 
                     <div class="card-footer">

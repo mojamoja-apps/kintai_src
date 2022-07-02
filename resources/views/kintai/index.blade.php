@@ -28,11 +28,23 @@
                     </div>
                     <div class="form-group col-lg-12">
                         <button type="button" id="kintai_btn_1" data-dakokumode="1" class="btn btn-block btn-lg btn-primary">出勤</button>
-                        <button type="button" id="kintai_btn_2" data-dakokumode="2" class="btn btn-block btn-lg btn-success">休憩①入</button>
-                        <button type="button" id="kintai_btn_3" data-dakokumode="3" class="btn btn-block btn-lg btn-info">休憩①出</button>
-                        <button type="button" id="kintai_btn_4" data-dakokumode="4" class="btn btn-block btn-lg btn-secondary">休憩②入</button>
-                        <button type="button" id="kintai_btn_5" data-dakokumode="5" class="btn btn-block btn-lg btn-warning">休憩②出</button>
+                        @if ($client->rest == 2)
+                        <button type="button" id="kintai_btn_2" data-dakokumode="2" class="btn btn-block btn-lg btn-success">休憩開始</button>
+                        <button type="button" id="kintai_btn_3" data-dakokumode="3" class="btn btn-block btn-lg btn-info">休憩終了</button>
+                        @endif
+                        @if ($client->rest == 3)
+                        <button type="button" id="kintai_btn_2" data-dakokumode="2" class="btn btn-block btn-lg btn-success">休憩①開始</button>
+                        <button type="button" id="kintai_btn_3" data-dakokumode="3" class="btn btn-block btn-lg btn-info">休憩①終了</button>
+                        <button type="button" id="kintai_btn_4" data-dakokumode="4" class="btn btn-block btn-lg btn-secondary">休憩②開始</button>
+                        <button type="button" id="kintai_btn_5" data-dakokumode="5" class="btn btn-block btn-lg btn-warning">休憩②終了</button>
+                        @endif
                         <button type="button" id="kintai_btn_6" data-dakokumode="6" class="btn btn-block btn-lg btn-danger">退勤</button>
+                        @if ($client->midnight == true)
+                        <div class="custom-control custom-checkbox text-right m-2">
+                            <input class="custom-control-input" type="checkbox" id="midnight" name="midnight" value="1">
+                            <label for="midnight" class="custom-control-label">前日分の退勤として打刻する</label>
+                        </div>
+                        @endif
                     </div>
                 </div>
                 <div class="overlay dark" id="overlay_spin" style="display: none;">

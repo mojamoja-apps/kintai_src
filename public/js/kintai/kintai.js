@@ -49,11 +49,16 @@ $('.btn').click(function (e) {
 });
 
 function fn_send(position) {
+    var zangyo = '';
+    if (dakokumode == 6 && $("#midnight").prop("checked")) {
+        zangyo = ' ※前日分の退勤として打刻';
+    }
     Swal.fire({
         title: '以下の内容で打刻します。',
         html: $('#employee option:selected').text() + ' さん<br>'
-        + dakokutext + '<br>'
-        + $('#time').html() + '<br>',
+        + dakokutext + zangyo + '<br>'
+        + $('#time').html() + '<br>'
+        ,
         icon: 'question',
 
         showCancelButton: true,
@@ -72,25 +77,31 @@ function fn_send(position) {
                 url: location.href + "/dakoku",
                 data: {
                     "_token" : CSRF_TOKEN,
-                    "id" : $('#employee').val(),
+                    "employee_id" : $('#employee').val(),
                     "dakokumode" : dakokumode,
+                    "midnight" : $("#midnight").prop("checked"),
                     "lat" : position.coords.latitude,
                     "lon" : position.coords.longitude,
                 },
                 dataType : "json"
             }).done(function(data){
-                Toast.fire({
+                Swal.fire({
                     icon: 'success',
                     title: '登録しました！',
+                    text: 'ページを再読み込みしますのでお待ちください・・・',
                 });
+                setTimeout(function() {
+                    location.reload();
+                }, 3000);
             }).fail(function(XMLHttpRequest, status, e){
                 Swal.fire({
                     icon: 'error',
                     title: 'エラーが発生しました！管理者にお問い合わせください。',
                     text: e,
                 });
-            }).always(function() {
                 $('#overlay_spin').hide();
+            }).always(function() {
+                //$('#overlay_spin').hide();
             });
         } else {
             return false;
@@ -165,5 +176,11 @@ $("#twoItemSearch").select2({
     matcher: twoSearch
 });
 
+
+
+// 5分に一度ページ再読み込み
+setTimeout(function() {
+    location.reload();
+}, 1000*60*5);
 
 
