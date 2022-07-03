@@ -1,56 +1,43 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
-use App\Models\Report;
-use App\Models\ReportWorking;
-use App\Models\ReportDriver;
-use App\Models\Company;
-use App\Models\Site;
-use App\Models\Worker;
+use App\Models\Client;
+use App\Models\Kintai;
+use App\Services\ClientService;
+use App\Services\EmployeeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Auth;
 
 use Carbon\Carbon;
 use App\Services\DatetimeUtility;
 
-class ReportController extends Controller
+class ClientKintaiController extends Controller
 {
     public $search_session_name;
-    public $companies;
-    public $sites;
-    public $workers;
+    public $employees;
 
     function __construct() {
-        $this->search_session_name = 'report';
+        $this->search_session_name = 'admin_kintai';
 
         // cardの開閉 全閉じ状態を初期値 必要に応じてオープン
         $collapse = config('const.COLLAPSE.CLOSE');
-
-        // 元請け一覧
-        $companies = Company::all()->sortBy('id');
-        // key,value ペアに直す
-        $this->companies = $companies->pluck('name','id')->prepend( "選択してください", "");
-
-        // 作業所一覧
-        $sites = Site::all()->sortBy('id');
-        // key,value ペアに直す
-        $this->sites = $sites->pluck(null,'id')->toArray();
-
-        // 作業員一覧
-        $workers = Worker::all()->sortBy('kana');
-        // key,value ペアに直す
-        $this->workers = $workers->pluck('name','id')->prepend( "", "");
     }
 
     public function index(Request $request) {
         // cardの開閉 全閉じ状態を初期値 必要に応じてオープン
         $collapse = config('const.COLLAPSE.CLOSE');
 
+        // クライアントIDを元に社員一覧
+        $employeeService = New EmployeeService();
+        $employees = $employeeService->findEmployeesByClientId(Auth::id());
 
 
-        $query = Report::query();
+
+        $query = Kintai::query();
+        $query->where('client_id', Auth::id());
 
         //検索
         $method = $request->method();
@@ -125,14 +112,12 @@ class ReportController extends Controller
             $collapse = config('const.COLLAPSE.OPEN');
         }
 
-        $reports = $query->orderBy('day', 'desc')->orderBy('id', 'asc')->limit(
+        $kintais = $query->orderBy('day', 'asc')->orderBy('id', 'asc')->limit(
             config('const.max_get')
         )->get();
 
-        $companies = $this->companies;
-        $sites = $this->sites;
 
-        return view('admin/report/index', compact('reports', 'search', 'collapse', 'companies', 'sites'));
+        return view('client/kintai/index', compact('kintais', 'search', 'collapse', 'employees'));
     }
 
     public function view($id = null) {

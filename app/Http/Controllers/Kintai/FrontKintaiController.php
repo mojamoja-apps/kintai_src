@@ -20,7 +20,6 @@ class FrontKintaiController extends Controller
 {
     public $search_session_name;
     public $clients;
-    public $employees;
 
     function __construct() {
         $this->search_session_name = 'frontkintai';
@@ -43,12 +42,6 @@ class FrontKintaiController extends Controller
         $clients = Client::all()->sortBy('id');
         // key,value ペアに直す
         $this->clients = $clients->pluck('name','id')->prepend( "選択してください", "");
-
-
-        // 作業員一覧
-        $employees = Employee::all()->sortBy('kana');
-        // key,value ペアに直す
-        $this->employees = $employees->pluck('name','id')->prepend( "", "");
     }
 
     public function index(Request $request, $hash) {
@@ -96,7 +89,7 @@ class FrontKintaiController extends Controller
         // 既存レコード存在チェック
         $dt = Carbon::now();
         $day = $dt->format('Y/m/d');
-        $time = $dt->format('h:i:s');
+        $time = $dt->format('H:i:s');
 
         $kintai = Kintai::
                     where('client_id', $client->id)
@@ -113,7 +106,10 @@ class FrontKintaiController extends Controller
         }
 
 
-        $target_column = 'time_' . $request->input('dakokumode'); // 1～6
+         // 対象カラム モードにより1～6
+        $time_column = 'time_' . $request->input('dakokumode');
+        $lat_column = 'lat_' . $request->input('dakokumode');
+        $lon_column = 'lon_' . $request->input('dakokumode');
 
         // 更新対象データ
         $midnight = 0;
@@ -129,10 +125,10 @@ class FrontKintaiController extends Controller
             'client_id' => $client->id,
             'employee_id' => $request->input('employee_id'),
             'day' => $day,
-            $target_column => $time,
+            $time_column => $time,
             'midnight' => $midnight,
-            'lat' => $request->input('lat'),
-            'lon' => $request->input('lon'),
+            $lat_column => $request->input('lat'),
+            $lon_column => $request->input('lon'),
         ];
 
         $result = Kintai::updateOrCreate(

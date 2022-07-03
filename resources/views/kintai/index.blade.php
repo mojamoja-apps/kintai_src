@@ -57,6 +57,9 @@
 </div>
 
 
+{{-- GPS取得機能オンオフ --}}
+<input type="hidden" id="gps_enabled" name="gps_enabled" value="{{ $client->gps ? 1 : 0 }}">
+
 
 
 

@@ -1,14 +1,15 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\Report\FrontReportController;
 
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\AdminClientController;
 use App\Http\Controllers\Admin\SiteController;
 
 use App\Http\Controllers\Client\EmployeeController;
+use App\Http\Controllers\Client\ClientKintaiController;
 
 use App\Http\Controllers\Kintai\FrontKintaiController;
 
@@ -55,9 +56,14 @@ Route::middleware( ['auth'])->group(function () {
     Route::post('/client/employee/update/{id?}', [EmployeeController::class, 'update'])->name('client.employee.update');
     Route::post('/client/employee/destroy/{id}', [EmployeeController::class, 'destroy'])->name('client.employee.destroy');
     Route::post('/client/employee/orderupdate', [EmployeeController::class, 'orderupdate'])->name('client.employee.orderupdate');
+
+    // 勤怠管理
+    Route::match(['get', 'post'], '/client/kintai', [ClientKintaiController::class, 'index'])->name('client.kintai.index');
+    Route::get('/client/kintai/edit/{id?}', [ClientKintaiController::class, 'edit'])->name('client.kintai.edit');
+    Route::post('/client/kintai/update/{id?}', [ClientKintaiController::class, 'update'])->name('client.kintai.update');
+    Route::post('/client/kintai/destroy/{id}', [ClientKintaiController::class, 'destroy'])->name('client.kintai.destroy');
+
 });
 
-// API 作業証明書の重複チェック
-Route::post('/api/validate/report', [ValidateController::class, 'report'])->name('api.validate.report');
 
 require __DIR__.'/auth.php';

@@ -27,8 +27,18 @@ return new class extends Migration
             $table->time("time_5")->nullable()->comment("休憩終了2");
             $table->time("time_6")->nullable()->comment("勤務終了");
             $table->boolean('midnight')->default(false)->comment('深夜残業 前日分の退勤として打刻チェック');
-            $table->double('lat', 10, 6)->nullable()->comment('緯度');
-            $table->double('lon', 10, 6)->nullable()->comment('経度');
+            $table->double('lat_1', 10, 6)->nullable()->comment('緯度-勤務開始');
+            $table->double('lon_1', 10, 6)->nullable()->comment('経度-勤務開始');
+            $table->double('lat_2', 10, 6)->nullable()->comment('緯度-休憩開始1');
+            $table->double('lon_2', 10, 6)->nullable()->comment('経度-休憩開始1');
+            $table->double('lat_3', 10, 6)->nullable()->comment('緯度-休憩終了1');
+            $table->double('lon_3', 10, 6)->nullable()->comment('経度-休憩終了1');
+            $table->double('lat_4', 10, 6)->nullable()->comment('緯度-休憩開始2');
+            $table->double('lon_4', 10, 6)->nullable()->comment('経度-休憩開始2');
+            $table->double('lat_5', 10, 6)->nullable()->comment('緯度-休憩終了2');
+            $table->double('lon_5', 10, 6)->nullable()->comment('経度-休憩終了2');
+            $table->double('lat_6', 10, 6)->nullable()->comment('緯度-勤務終了');
+            $table->double('lon_6', 10, 6)->nullable()->comment('経度-勤務終了');
 
 
             $table->timestamps();

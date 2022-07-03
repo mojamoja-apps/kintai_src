@@ -34,6 +34,7 @@ var Toast = Swal.mixin({
     timer: 3000
 });
 
+// 打刻ボタンクリックイベント
 $('.btn').click(function (e) {
     if ($('#employee').val() == '') {
         Swal.fire({
@@ -45,10 +46,23 @@ $('.btn').click(function (e) {
 
     dakokumode = $(this).data('dakokumode');
     dakokutext = $(this).text();
-    navigator.geolocation.getCurrentPosition(fn_send, fn_error);
+
+    if ($('#gps_enabled').val() == 1) {
+        navigator.geolocation.getCurrentPosition(fn_send, fn_error);
+    } else {
+        fn_send(null);
+    }
 });
 
 function fn_send(position) {
+    // GPSオン時はpositionにセットされている
+    // オフ時はnullで来る
+    lat = null;
+    lon = null;
+    if (position !== null) {
+        lat = position.coords.latitude;
+        lon = position.coords.longitude;
+    }
     var zangyo = '';
     if (dakokumode == 6 && $("#midnight").prop("checked")) {
         zangyo = ' ※前日分の退勤として打刻';
@@ -80,8 +94,8 @@ function fn_send(position) {
                     "employee_id" : $('#employee').val(),
                     "dakokumode" : dakokumode,
                     "midnight" : $("#midnight").prop("checked"),
-                    "lat" : position.coords.latitude,
-                    "lon" : position.coords.longitude,
+                    "lat" : lat,
+                    "lon" : lon,
                 },
                 dataType : "json"
             }).done(function(data){

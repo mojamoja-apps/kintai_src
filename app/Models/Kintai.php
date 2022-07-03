@@ -15,6 +15,12 @@ class Kintai extends Model
 
     protected $dates = [
         'day',
+        'time_1',
+        'time_2',
+        'time_3',
+        'time_4',
+        'time_5',
+        'time_6',
     ];
 
     //belongsTo設定
