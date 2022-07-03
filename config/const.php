@@ -17,6 +17,37 @@ return [
         'taikin' => 6,
     ],
 
+    'dakokunames_rest_1' => [
+        1 => '出勤',
+        6 => '退勤',
+    ],
+
+    'dakokunames_rest_2' => [
+        1 => '出勤',
+        2 => '休憩開始',
+        3 => '休憩終了',
+        6 => '退勤',
+    ],
+
+    'dakokunames_rest_3' => [
+        1 => '出勤',
+        2 => '休憩①開始',
+        3 => '休憩①終了',
+        4 => '休憩②開始',
+        5 => '休憩②終了',
+        6 => '退勤',
+    ],
+
+    'dakokunames_themes' => [
+        1 => 'primary',
+        2 => 'success',
+        3 => 'info',
+        4 => 'secondary',
+        5 => 'warning',
+        6 => 'danger',
+    ],
+
+
     'youbi' => [
         '日', //0
         '月', //1

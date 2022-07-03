@@ -257,6 +257,7 @@ $('#datatable1').DataTable({
     "stateSave": true,
     "paging": true,
     "lengthChange": false,
+    "pageLength": 50,
     "searching": false,
     "ordering": true,
     "info": true,

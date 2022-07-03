@@ -41,6 +41,10 @@ class ClientKintaiController extends Controller
 
         // 勤怠情報を取得
         $query = Kintai::query();
+        $query->select(
+            'kintais.*',
+            'employees.id AS emp_id',
+        );
         $query->where('kintais.client_id', Auth::id());
 
         // 社員の並び順にしたいので社員マスタをjoin
@@ -129,85 +133,42 @@ class ClientKintaiController extends Controller
             config('const.max_get')
         )->get();
 
-
         return view('client/kintai/index', compact('kintais', 'search', 'collapse', 'employees'));
     }
 
-    public function view($id = null) {
-
-        // cardの開閉 全閉じ状態を初期値 必要に応じてオープン
-        $collapse = [];
-        $collapse[1] = config('const.COLLAPSE.CLOSE');
-        $collapse[2] = config('const.COLLAPSE.CLOSE');
-        $collapse[3] = config('const.COLLAPSE.CLOSE');
-        $collapse[4] = config('const.COLLAPSE.CLOSE');
-        $collapse[5] = config('const.COLLAPSE.CLOSE');
-        $collapse[98] = false; // 作業員追加ボタン
-        $collapse[99] = config('const.COLLAPSE.CLOSE'); // 99:協力員
-
-        $collapse['tobi1'] = false;
-        $collapse['tobi2'] = false;
-        $collapse['tobi3'] = false;
-        $collapse['tobi4'] = false;
-        $collapse['tobi5'] = false;
-        $collapse['doko1'] = false;
-        $collapse['doko2'] = false;
-        $collapse['doko3'] = false;
-        $collapse['doko4'] = false;
-        $collapse['doko5'] = false;
+    public function edit($id = null) {
 
         if ($id == null) {
             $mode = config('const.editmode.create');
-            $report = New Report; //新規なので空のインスタンスを渡す
+            $kintai = New Kintai; //新規なので空のインスタンスを渡す
 
         } else {
             $mode = config('const.editmode.edit');
-            $report = Report::find($id);
 
-            if (!empty($report->koji_1_memo)) $collapse[1] = config('const.COLLAPSE.OPEN');
-            if (!empty($report->koji_2_memo)) $collapse[2] = config('const.COLLAPSE.OPEN');
-            if (!empty($report->koji_3_memo)) $collapse[3] = config('const.COLLAPSE.OPEN');
-            if (!empty($report->koji_4_memo)) $collapse[4] = config('const.COLLAPSE.OPEN');
-            if (!empty($report->koji_5_memo)) $collapse[5] = config('const.COLLAPSE.OPEN');
+            //$report = Report::findOrFail($id);
 
-            // 鳶土工 2～5の入力があれば 追加ボタンを開く
-            foreach(config('const.KOJINAMES') as $kojikey => $kojiname) {
-                foreach(config('const.TOBI_DOKO') as $tobidokokey => $tobidokoname) {
-                    if (
-                        !empty($report->{"koji_" . $kojikey . "_" . $tobidokokey . "_2_num"})
-                        || !empty($report->{"koji_" . $kojikey . "_" . $tobidokokey . "_3_num"})
-                        || !empty($report->{"koji_" . $kojikey . "_" . $tobidokokey . "_4_num"})
-                        || !empty($report->{"koji_" . $kojikey . "_" . $tobidokokey . "_5_num"})
-                    ) {
-                        $collapse["{$tobidokokey}{$kojikey}"] = true;
-                    }
-                }
-            }
-
-            // 作業員 15～29人の入力があれば 追加ボタンを開く
-            foreach ($report->reportworkings as $key => $reportworking) {
-                if ($key >= 15 && $key <= 29) {
-                    if (isset($reportworking->worker_id)) {
-                        $collapse[98] = true;
-                    }
-                }
-            }
-            // 作業員 30人以降の入力があれば 協力員カードは開く
-            foreach ($report->reportworkings as $key => $reportworking) {
-                if ($key >= 30) {
-                    if (isset($reportworking->worker_id)) {
-                        $collapse[99] = config('const.COLLAPSE.OPEN');
-                    }
-                }
-            }
+            $query = Kintai::query();
+            $query->where('id', $id);
+            $query->where('client_id', Auth::id());
+            $kintai = $query->firstOrFail();
         }
 
 
-        $companies = $this->companies;
-        $sites = $this->sites;
-        $workers = $this->workers;
+        // クライアントIDを元に社員一覧
+        $employeeService = New EmployeeService();
+        $employees = $employeeService->findEmployeesByClientId(Auth::id());
 
-        return view('admin/report/view', compact('report', 'mode', 'collapse', 'companies', 'sites', 'workers'));
+
+        // 休憩設定により打刻ループを設定
+        if (Auth::user()->rest == 1) {
+            $dakoku_names = config('const.dakokunames_rest_1');
+        } else if (Auth::user()->rest == 2) {
+            $dakoku_names = config('const.dakokunames_rest_2');
+        } else if (Auth::user()->rest == 3) {
+            $dakoku_names = config('const.dakokunames_rest_3');
+        }
+
+        return view('client/kintai/edit', compact('kintai', 'mode', 'employees', 'dakoku_names'));
     }
 
 
