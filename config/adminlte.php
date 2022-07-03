@@ -319,6 +319,51 @@ return [
                     'asset' => true,
                     'location' => '//cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css',
                 ],
+
+
+                [
+                    'type' => 'css',
+                    'asset' => true,
+                    'location' => '//cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css',
+                ],
+                [
+                    'type' => 'css',
+                    'asset' => true,
+                    'location' => '//cdn.datatables.net/buttons/2.2.3/css/buttons.bootstrap4.min.css',
+                ],
+                [
+                    'type' => 'js',
+                    'asset' => true,
+                    'location' => '//cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js',
+                ],
+                [
+                    'type' => 'js',
+                    'asset' => true,
+                    'location' => '//cdn.datatables.net/buttons/2.2.3/js/buttons.bootstrap4.min.js',
+                ],
+                [
+                    'type' => 'js',
+                    'asset' => true,
+                    'location' => '//cdn.datatables.net/buttons/2.2.3/js/buttons.colVis.min.js',
+                ],
+                [
+                    'type' => 'js',
+                    'asset' => true,
+                    'location' => '//cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js',
+                ],
+                [
+                    'type' => 'js',
+                    'asset' => true,
+                    'location' => '//cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js',
+                ],
+
+
+
+
+
+
+
+
             ],
         ],
         'Select2' => [

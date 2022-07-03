@@ -43,12 +43,28 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>社員</label>
-                                    <select name="employee" id="employee" class="form-control select2" style="width: 100%;">
+                                    <select name="employee_id" id="employee_id" class="form-control select2" style="width: 100%;">
                                         <option value="" data-sub-search="">氏名・ふりがなで絞込</option>
 @foreach($employees as $employee)
-                                        <option value="{{$employee->id}}" data-sub-search="{{$employee->kana}}">{{$employee->name}}</option>
+                                        <option value="{{$employee->id}}" data-sub-search="{{$employee->kana}}"
+                                        @if ($search['employee_id'] == $employee->id) selected @endif
+                                        >{{$employee->name}}</option>
 @endforeach
                                     </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="form-inline">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="is_dakokumore" name="is_dakokumore" value="1"
+                                            @if ($search['is_dakokumore'] == 1) checked @endif
+                                            >
+                                            <label for="is_dakokumore" class="custom-control-label">打刻漏れがある勤怠のみ</label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -75,12 +91,19 @@
                         <thead>
                             <tr>
                                 <th>日付</th>
+                                <th>コード</th>
                                 <th>氏名</th>
                                 <th>出勤</th>
+                                @if (Auth::user()->rest == 2)
+                                <th>休憩開始</th>
+                                <th>休憩終了</th>
+                                @endif
+                                @if (Auth::user()->rest == 3)
                                 <th>休憩①開始</th>
                                 <th>休憩①終了</th>
                                 <th>休憩②開始</th>
                                 <th>休憩②終了</th>
+                                @endif
                                 <th>退勤</th>
                                 <th>勤務時間</th>
                                 <th></th>
@@ -89,14 +112,23 @@
                         <tbody>
                         @foreach($kintais as $kintai)
                             <tr class="kintai_data_row">
-                                <td>{{ $kintai->day !== null ? $kintai->day->format('Y/m/d') : '' }}</td>
+                                <td>{{ $kintai->day !== null ?
+                                        $kintai->day->format('m/d') . '(' . config('const.youbi.' . $kintai->day->format('w')) . ')'
+                                        : '' }}</td>
+                                <td>{{ $kintai->employee->code }}</td>
                                 <td>{{ $kintai->employee->name }}</td>
-                                <td>{{ $kintai->time_1 !== null ? $kintai->time_1->format('h:i') : '' }}</td>
-                                <td>{{ $kintai->time_2 !== null ? $kintai->time_2->format('h:i') : '' }}</td>
-                                <td>{{ $kintai->time_3 !== null ? $kintai->time_3->format('h:i') : '' }}</td>
-                                <td>{{ $kintai->time_4 !== null ? $kintai->time_4->format('h:i') : '' }}</td>
-                                <td>{{ $kintai->time_5 !== null ? $kintai->time_5->format('h:i') : '' }}</td>
-                                <td>{{ $kintai->time_6 !== null ? $kintai->time_6->format('h:i') : '' }}</td>
+                                <td>{{ $kintai->time_1 !== null ? $kintai->time_1->format('H:i') : '' }}</td>
+                                @if (Auth::user()->rest == 2)
+                                <td>{{ $kintai->time_2 !== null ? $kintai->time_2->format('H:i') : '' }}</td>
+                                <td>{{ $kintai->time_3 !== null ? $kintai->time_3->format('H:i') : '' }}</td>
+                                @endif
+                                @if (Auth::user()->rest == 3)
+                                <td>{{ $kintai->time_2 !== null ? $kintai->time_2->format('H:i') : '' }}</td>
+                                <td>{{ $kintai->time_3 !== null ? $kintai->time_3->format('H:i') : '' }}</td>
+                                <td>{{ $kintai->time_4 !== null ? $kintai->time_4->format('H:i') : '' }}</td>
+                                <td>{{ $kintai->time_5 !== null ? $kintai->time_5->format('H:i') : '' }}</td>
+                                @endif
+                                <td>{{ $kintai->time_6 !== null ? $kintai->time_6->format('H:i') : '' }}</td>
                                 <td class="text-right">99</td>
                                 <td class="text-center">
                                     <button type="button" class="btn btn-primary" onclick="location.href='{{route('client.kintai.edit',['id' => $kintai->id])}}'">詳細</button>
@@ -141,7 +173,86 @@
 <script>
 $('#datatable1').DataTable({
     "language": {
-        "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Japanese.json",
+        //"url": "//cdn.datatables.net/plug-ins/1.12.1/i18n/ja.json",
+// JSON読み込みだとCSVボタンがでてこなくなってしまうので・・・
+        "emptyTable": "テーブルにデータがありません",
+        "info": " _TOTAL_ 件中 _START_ から _END_ まで表示",
+        "infoEmpty": " 0 件中 0 から 0 まで表示",
+        "infoFiltered": "（全 _MAX_ 件より抽出）",
+        "infoThousands": ",",
+        "lengthMenu": "_MENU_ 件表示",
+        "loadingRecords": "読み込み中...",
+        "processing": "処理中...",
+        "search": "検索:",
+        "zeroRecords": "一致するレコードがありません",
+        "paginate": {
+            "first": "先頭",
+            "last": "最終",
+            "next": "次",
+            "previous": "前"
+        },
+        "aria": {
+            "sortAscending": ": 列を昇順に並べ替えるにはアクティブにする",
+            "sortDescending": ": 列を降順に並べ替えるにはアクティブにする"
+        },
+        "thousands": ",",
+        "buttons": {
+            "colvis": "項目の表示\/非表示",
+            "csv": "CSV"
+        },
+        "searchBuilder": {
+            "add": "条件を追加",
+            "button": {
+                "0": "カスタムサーチ",
+                "_": "カスタムサーチ (%d)"
+            },
+            "clearAll": "すべての条件をクリア",
+            "condition": "条件",
+            "conditions": {
+                "date": {
+                    "after": "次の日付以降",
+                    "before": "次の日付以前",
+                    "between": "次の期間に含まれる",
+                    "empty": "空白",
+                    "equals": "次の日付と等しい",
+                    "not": "次の日付と等しくない",
+                    "notBetween": "次の期間に含まれない",
+                    "notEmpty": "空白ではない"
+                },
+                "number": {
+                    "between": "次の値の間に含まれる",
+                    "empty": "空白",
+                    "equals": "次の値と等しい",
+                    "gt": "次の値よりも大きい",
+                    "gte": "次の値以上",
+                    "lt": "次の値未満",
+                    "lte": "次の値以下",
+                    "not": "次の値と等しくない",
+                    "notBetween": "次の値の間に含まれない",
+                    "notEmpty": "空白ではない"
+                },
+                "string": {
+                    "contains": "次の文字を含む",
+                    "empty": "空白",
+                    "endsWith": "次の文字で終わる",
+                    "equals": "次の文字と等しい",
+                    "not": "次の文字と等しくない",
+                    "notEmpty": "空白ではない",
+                    "startsWith": "次の文字から始まる",
+                    "notContains": "次の文字を含まない",
+                    "notStarts": "次の文字で始まらない",
+                    "notEnds": "次の文字で終わらない"
+                }
+            },
+            "data": "項目",
+            "title": {
+                "0": "カスタムサーチ",
+                "_": "カスタムサーチ (%d)"
+            },
+            "value": "値"
+        }
+// ここまで
+
     },
     "stateSave": true,
     "paging": true,
@@ -157,8 +268,8 @@ $('#datatable1').DataTable({
         { responsivePriority: 3, targets: 1 },
         { targets: -1, width: "120px" },
     ],
-});
-
+    "buttons": ["csv"],
+}).buttons().container().appendTo('#datatable1_wrapper .col-md-6:eq(0)');
 
 
 

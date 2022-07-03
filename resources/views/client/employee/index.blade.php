@@ -96,7 +96,7 @@ $( "#datatable1 tbody" ).disableSelection();
 
 $('#datatable1').DataTable({
     "language": {
-        "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Japanese.json",
+        "url": "//cdn.datatables.net/plug-ins/1.12.1/i18n/ja.json",
     },
     "stateSave": true,
     "paging": false,
@@ -113,6 +113,22 @@ $('#datatable1').DataTable({
         { responsivePriority: 4, targets: 4 },
     ],
 });
+
+
+@if (session('flash_message'))
+// 表示順更新後のフラッシュメッセージ
+var Toast = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000
+});
+Toast.fire({
+  icon: 'success',
+  title: '{{ session('flash_message') }}'
+})
+@endif
+
 
 </script>
 @stop

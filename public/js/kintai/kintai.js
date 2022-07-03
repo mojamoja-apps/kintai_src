@@ -106,7 +106,7 @@ function fn_send(position) {
                 });
                 setTimeout(function() {
                     location.reload();
-                }, 3000);
+                }, 1500);
             }).fail(function(XMLHttpRequest, status, e){
                 Swal.fire({
                     icon: 'error',

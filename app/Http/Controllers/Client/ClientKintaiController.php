@@ -9,6 +9,7 @@ use App\Services\ClientService;
 use App\Services\EmployeeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Auth;
 
 use Carbon\Carbon;
@@ -36,8 +37,14 @@ class ClientKintaiController extends Controller
 
 
 
+
+
+        // 勤怠情報を取得
         $query = Kintai::query();
-        $query->where('client_id', Auth::id());
+        $query->where('kintais.client_id', Auth::id());
+
+        // 社員の並び順にしたいので社員マスタをjoin
+        $query->leftJoin('employees', 'kintais.employee_id', '=', 'employees.id');
 
         //検索
         $method = $request->method();
@@ -47,9 +54,8 @@ class ClientKintaiController extends Controller
         $search_keys = [
             'day_st',
             'day_ed',
-            'company_id',
-            'site_id',
-            'keyword',
+            'employee_id',
+            'is_dakokumore',
         ];
         foreach ($search_keys as $keyname) {
             $search[$keyname] = '';
@@ -81,29 +87,36 @@ class ClientKintaiController extends Controller
             $open = true;
         }
 
-        if ($search['company_id']) {
-            $query->where('company_id', $search['company_id']);
+        if ($search['employee_id']) {
+            $query->where('employee_id', $search['employee_id']);
             $open = true;
         }
 
-        if ($search['site_id']) {
-            $query->where('site_id', $search['site_id']);
-            $open = true;
-        }
-
-        if ($search['keyword']) {
-            // 全角スペースを半角に変換
-            $spaceConversion = mb_convert_kana($search['keyword'], 's');
-            // 単語を半角スペースで区切り、配列にする（例："山田 翔" → ["山田", "翔"]）
-            $wordArraySearched = preg_split('/[\s,]+/', $spaceConversion, -1, PREG_SPLIT_NO_EMPTY);
-            // 単語をループで回し、ユーザーネームと部分一致するものがあれば、$queryとして保持される
-            foreach($wordArraySearched as $value) {
-                $query->where('koji_1_memo', 'like', '%'.$value.'%')
-                    ->OrWhere('koji_2_memo', 'like', '%'.$value.'%')
-                    ->OrWhere('koji_3_memo', 'like', '%'.$value.'%')
-                    ->OrWhere('koji_4_memo', 'like', '%'.$value.'%')
-                    ->OrWhere('koji_5_memo', 'like', '%'.$value.'%')
-                ;
+        if ($search['is_dakokumore']) {
+            if (Auth::user()->rest == 1) {
+                $query->where(function($query){
+                    $query->where('time_1', '=', NULL)
+                        ->orWhere('time_6', '=', NULL)
+                    ;
+                });
+            } else if (Auth::user()->rest == 2) {
+                $query->where(function($query){
+                    $query->where('time_1', '=', NULL)
+                        ->orWhere('time_2', '=', NULL)
+                        ->orWhere('time_3', '=', NULL)
+                        ->orWhere('time_6', '=', NULL)
+                    ;
+                });
+            } else if (Auth::user()->rest == 3) {
+                $query->where(function($query){
+                    $query->where('time_1', '=', NULL)
+                        ->orWhere('time_2', '=', NULL)
+                        ->orWhere('time_3', '=', NULL)
+                        ->orWhere('time_4', '=', NULL)
+                        ->orWhere('time_5', '=', NULL)
+                        ->orWhere('time_6', '=', NULL)
+                    ;
+                });
             }
             $open = true;
         }
@@ -112,7 +125,7 @@ class ClientKintaiController extends Controller
             $collapse = config('const.COLLAPSE.OPEN');
         }
 
-        $kintais = $query->orderBy('day', 'asc')->orderBy('id', 'asc')->limit(
+        $kintais = $query->orderBy('day', 'asc')->orderBy('order', 'asc')->orderBy('employees.id', 'asc')->limit(
             config('const.max_get')
         )->get();
 

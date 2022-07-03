@@ -144,6 +144,7 @@ class EmployeeController extends Controller
         // CSRFトークンを再生成して、二重送信対策
         $request->session()->regenerateToken();
 
+        session()->flash('flash_message', '表示順を変更しました。');
         return redirect( route('client.employee.index') );
     }
 

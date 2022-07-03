@@ -24,9 +24,9 @@ class FrontKintaiController extends Controller
     function __construct() {
         $this->search_session_name = 'frontkintai';
 
-        // 作業証明書入力画面では 管理画面レイアウトを調整する
-        config(['adminlte.title' => '作業証明書入力画面']);
-        config(['adminlte.logo' => '作業証明書入力画面']);
+        // フロントでは 管理画面レイアウトを調整する
+        config(['adminlte.title' => '']);
+        config(['adminlte.logo' => '']);
         // ユーザーメニュー非表示
         config(['adminlte.usermenu_enabled' => false]);
         // ログアウトメニュー非表示
