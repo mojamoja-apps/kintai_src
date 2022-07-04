@@ -129,10 +129,33 @@ class ClientKintaiController extends Controller
             $collapse = config('const.COLLAPSE.OPEN');
         }
 
-        $kintais = $query->orderBy('day', 'asc')->orderBy('order', 'asc')->orderBy('employees.id', 'asc')->limit(
+        $kintais = $query->orderBy('day', 'DESC')->orderBy('order', 'ASC')->orderBy('employees.id', 'ASC')->limit(
             config('const.max_get')
         )->get();
 
+        // 勤務時間を計算
+        $kintais->map(function ($val) {
+            if (
+                $val['time_1'] !== NULL
+                && $val['time_6'] !== NULL
+            ) {
+                $st = Carbon::parse($val['time_1']);
+                $ed = Carbon::parse($val['time_6']);
+                $st->diffInHours($ed);
+                //$day = DatetimeUtility::date('Y/m/d H:i:s', $ddd->timestamp);
+                //dd($st->diffInHours($ed));
+                $minutes = $st->diffInMinutes($ed);
+                $val['work_hour'] = floor_reitengo($minutes / 60);
+            } else {
+                $val['work_hour'] = NULL;
+            }
+            return $val;
+        });
+
+// foreach ($kintais as $key => $kintai) {
+// ddd($kintai);
+//     # code...
+// }
         return view('client/kintai/index', compact('kintais', 'search', 'collapse', 'employees'));
     }
 

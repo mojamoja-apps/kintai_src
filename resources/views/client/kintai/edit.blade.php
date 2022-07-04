@@ -25,10 +25,17 @@
                         <div class="form-group">
                             <label for="name">日付</label>
                             <div class="input-group col-lg-3 col-md-5 col-sm-6">
-                                <input type="text" class="form-control" name="day" id="day" value="{{ old('day', ($kintai->day != null ? $kintai->day->format('Y/m/d') : '') ) }}">
+                                <input type="text" class="form-control" name="day" id="day" value="{{ old('day', ($kintai->day != null ? $kintai->day->format('Y/m/d') : '') ) }}"
+                                @if ($mode == config('const.editmode.edit'))
+                                readonly
+                                @endif
+                                >
+
+                                @if ($mode == config('const.editmode.create'))
                                 <span class="input-group-append">
                                     <button type="button" class="btn btn-info btn-flat day_today_btn" >今日</button>
                                 </span>
+                                @endif
                             </div>
                             @if ($errors->has('day'))
                             <code>{{ $errors->first('day') }}</code>
@@ -37,7 +44,11 @@
 
                         <div class="form-group">
                             <label for="code">社員</label>
-                            <select name="employee" id="employee" class="form-control select2" style="width: 100%;">
+                            <select name="employee" id="employee" class="form-control select2"
+                            @if ($mode == config('const.editmode.edit'))
+                            readonly
+                            @endif
+                            >
                                 <option value="" data-sub-search="">氏名・ふりがなで絞込</option>
 @foreach($employees as $employee)
                                 <option value="{{$employee->id}}" data-sub-search="{{$employee->kana}}"
@@ -70,12 +81,14 @@
                                 <div class="input-group col-4">
                                     <label for="time_{{ $dakokukey }}">時間</label>
                                 </div>
+                                @if (Auth::user()->gps == true)
                                 <div class="input-group col-4">
                                     <label for="lat_{{ $dakokukey }}">緯度</label>
                                 </div>
                                 <div class="input-group col-4">
                                     <label for="lon_{{ $dakokukey }}">経度</label>
                                 </div>
+                                @endif
                             </div>
                             <div class="row">
                                 <div class="input-group col-4">
@@ -85,6 +98,7 @@
                                     <code>{{ $errors->first("time_{$dakokukey}") }}</code>
                                     @endif
                                 </div>
+                                @if (Auth::user()->gps == true)
                                 <div class="input-group col-4">
                                     <input type="text" class="form-control" name="lat_{{ $dakokukey }}" id="lat_{{ $dakokukey }}" placeholder="" maxlength="20" value="{{ old("lat_{$dakokukey}", $kintai->{"lat_{$dakokukey}"}) }}">
                                     @if ($errors->has("lat_{$dakokukey}"))
@@ -97,6 +111,7 @@
                                     <code>{{ $errors->first("lon_{$dakokukey}") }}</code>
                                     @endif
                                 </div>
+                                @endif
                             </div>
 
                         </div>

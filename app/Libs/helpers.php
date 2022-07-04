@@ -38,3 +38,19 @@ function fn_basic_auth($auth_list,$realm="Restricted Area",$failed_text="HTTP/1.
 
 	die($failed_text);
 }
+
+
+/**
+* 勤務時間数 0.5単位で切り捨て
+  2倍して小数点以下切り捨て、割る2
+  8.1→8
+  7.9→7.5
+  7.4→7
+  1.6→1.5
+*
+* @param number 切り捨て対象数値
+* @return number 切り捨て後数値
+*/
+function floor_reitengo($num) {
+    return floor($num * 2) /2;
+}

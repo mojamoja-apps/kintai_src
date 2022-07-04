@@ -113,7 +113,7 @@
                         @foreach($kintais as $kintai)
                             <tr class="kintai_data_row">
                                 <td>{{ $kintai->day !== null ?
-                                        $kintai->day->format('m/d') . '(' . config('const.youbi.' . $kintai->day->format('w')) . ')'
+                                        $kintai->day->format('Y/m/d') . '(' . config('const.youbi.' . $kintai->day->format('w')) . ')'
                                         : '' }}</td>
                                 <td>{{ $kintai->employee->code }}</td>
                                 <td>{{ $kintai->employee->name }}</td>
@@ -129,7 +129,7 @@
                                 <td>{{ $kintai->time_5 !== null ? $kintai->time_5->format('H:i') : '' }}</td>
                                 @endif
                                 <td>{{ $kintai->time_6 !== null ? $kintai->time_6->format('H:i') : '' }}</td>
-                                <td class="text-right">99</td>
+                                <td class="text-right">{{ $kintai->work_hour }}</td>
                                 <td class="text-center">
                                     <button type="button" class="btn btn-primary" onclick="location.href='{{route('client.kintai.edit',['id' => $kintai->id])}}'">詳細</button>
                                 </td>

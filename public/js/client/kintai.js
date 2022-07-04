@@ -63,13 +63,22 @@ var twoSearch = function(params, data) {
 };
 
 
-$(".select2").select2({
-    // 上で作った oneSearch メソッドを指定
-    matcher: oneSearch
-});
+if ($("#mode").val() == _MODE_CREATE) {
+    $(".select2").select2({
+        // 上で作った oneSearch メソッドを指定
+        matcher: oneSearch
+    });
 
-$("#twoItemSearch").select2({
-    // 上で作った twoSearch メソッドを指定
-    matcher: twoSearch
-});
+    $("#twoItemSearch").select2({
+        // 上で作った twoSearch メソッドを指定
+        matcher: twoSearch
+    });
+} else {
+    // 編集モード時 社員は変更できない
+    // 選択SELECT以外は選択不可にする
+    window.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('select[readonly] option')
+            .forEach(e => e.disabled = !e.selected);
+    });
+}
 
