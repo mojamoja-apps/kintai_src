@@ -241,13 +241,6 @@ return [
             'url'  => 'client/kintai',
             'icon' => 'fas fa-fw fa-clock',
         ],
-        [
-            'text' => '作業証明書入力画面',
-            'url'  => '',
-            'icon' => 'fas fa-fw fa-external-link-alt',
-            'target' => '_blank',
-            'id'  => 'kintai_link',
-        ],
     ],
 
     /*

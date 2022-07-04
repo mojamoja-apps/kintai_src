@@ -9,7 +9,7 @@ return [
     */
     'active' => env('BASIC_AUTH', true),
     'users' => [
-        ['id' => 'ookawa123', 'pass' => '789ookawa'],
+        ['id' => 'kintai', 'pass' => 'yscom789'],
     ],
 
 ];

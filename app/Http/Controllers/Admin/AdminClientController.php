@@ -22,7 +22,7 @@ class AdminClientController extends Controller
         // メニュー上書き
         config(['adminlte.menu' =>
             [
-                ['header' => '業務'],
+                ['header' => 'マスター設定'],
                 [
                     'text' => '企業管理',
                     'url'  => 'admin/client',
