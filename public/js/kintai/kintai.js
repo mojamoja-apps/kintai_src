@@ -1,4 +1,30 @@
 
+// バーコード読み込み＝キー入力を保存
+var inputtext = '';
+$(function(){
+    $(window).on('keydown', function(e) {
+        // エンターで検索
+        if (e.keyCode == 13) {
+            console.log(inputtext + 'reset!!!!!!');
+            if (inputtext != '') {
+                $('select#employee option').each(function(index) {
+                    if ($(this).data("sub-two-search") == inputtext) {
+                        $('select#employee').val($(this).val()).change();
+                        return false;//each終了
+                    }
+                });
+            }
+            inputtext = '';
+            return;
+        }
+        // 長すぎたら終了
+        if (inputtext.length >= 20) {
+            return;
+        }
+        inputtext += String.fromCharCode(e.keyCode);
+        console.log(inputtext);
+    });
+})
 var dakokumode = 1;
 // 1：出勤
 // 2：休憩1入
@@ -182,12 +208,7 @@ var twoSearch = function(params, data) {
 
 
 $(".select2").select2({
-    // 上で作った oneSearch メソッドを指定
-    matcher: oneSearch
-});
-
-$("#twoItemSearch").select2({
-    // 上で作った twoSearch メソッドを指定
+    //matcher: oneSearch
     matcher: twoSearch
 });
 

@@ -22,7 +22,7 @@
                         <select name="employee" id="employee" class="form-control select2" style="width: 100%;">
                             <option value="" data-sub-search="">氏名・ふりがなで絞込</option>
 @foreach($employees as $employee)
-                            <option value="{{$employee->id}}" data-sub-search="{{$employee->kana}}">{{$employee->name}}</option>
+                            <option value="{{$employee->id}}" data-sub-search="{{$employee->kana}}" data-sub-two-search="{{$employee->code}}">{{$employee->name}}</option>
 @endforeach
                         </select>
                     </div>
