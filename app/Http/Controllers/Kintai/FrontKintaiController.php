@@ -110,6 +110,7 @@ class FrontKintaiController extends Controller
         $time_column = 'time_' . $request->input('dakokumode');
         $lat_column = 'lat_' . $request->input('dakokumode');
         $lon_column = 'lon_' . $request->input('dakokumode');
+        $memo_column = 'memo_' . $request->input('dakokumode');
 
         // 更新対象データ
         $midnight = 0;
@@ -129,6 +130,7 @@ class FrontKintaiController extends Controller
             'midnight' => $midnight,
             $lat_column => $request->input('lat'),
             $lon_column => $request->input('lon'),
+            $memo_column => $request->input('memo'),
         ];
 
         $result = Kintai::updateOrCreate(
@@ -146,6 +148,7 @@ class FrontKintaiController extends Controller
             'midnight' => $midnight,
             'lat' => $request->input('lat'),
             'lon' => $request->input('lon'),
+            'memo' => $request->input('memo'),
         ];
         $rireki = Kintai_rireki::create($updarr);
 

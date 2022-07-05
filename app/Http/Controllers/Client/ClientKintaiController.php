@@ -60,6 +60,7 @@ class ClientKintaiController extends Controller
             'day_ed',
             'employee_id',
             'is_dakokumore',
+            'keyword',
         ];
         foreach ($search_keys as $keyname) {
             $search[$keyname] = '';
@@ -125,6 +126,26 @@ class ClientKintaiController extends Controller
             $open = true;
         }
 
+        if ($search['keyword']) {
+            // 全角スペースを半角に変換
+            $spaceConversion = mb_convert_kana($search['keyword'], 's');
+            // 単語を半角スペースで区切り、配列にする（例："山田 翔" → ["山田", "翔"]）
+            $wordArraySearched = preg_split('/[\s,]+/', $spaceConversion, -1, PREG_SPLIT_NO_EMPTY);
+            // 単語をループで回し、ユーザーネームと部分一致するものがあれば、$queryとして保持される
+            foreach($wordArraySearched as $value) {
+                $query->where('employees.name', 'like', '%'.$value.'%')
+                    ->OrWhere('employees.code', 'like', '%'.$value.'%')
+                    ->OrWhere('memo_1', 'like', '%'.$value.'%')
+                    ->OrWhere('memo_2', 'like', '%'.$value.'%')
+                    ->OrWhere('memo_3', 'like', '%'.$value.'%')
+                    ->OrWhere('memo_4', 'like', '%'.$value.'%')
+                    ->OrWhere('memo_5', 'like', '%'.$value.'%')
+                    ->OrWhere('memo_6', 'like', '%'.$value.'%')
+                ;
+            }
+            $open = true;
+        }
+
         if ($open) {
             $collapse = config('const.COLLAPSE.OPEN');
         }
@@ -168,7 +189,7 @@ class ClientKintaiController extends Controller
         } else {
             $mode = config('const.editmode.edit');
 
-            //$report = Report::findOrFail($id);
+            //$kintai = Kintai::findOrFail($id);
 
             $query = Kintai::query();
             $query->where('id', $id);
@@ -197,65 +218,86 @@ class ClientKintaiController extends Controller
 
 
 
+    // 更新処理
+    public function update(Request $request, $id = null) {
+        $request->validate([
+            'day' => 'required|date',
+            'employee_id' => 'required',
+        ]
+        ,[
+            'day.required' => '必須項目です。',
+            'day.date' => '有効な日付を指定してください。',
+            'employee_id.required' => '必須項目です。',
+        ]);
 
-
-
-
-
-    public function output($id) {
-        $report = Report::find($id);
-
-        $companies = $this->companies;
-        $sites = $this->sites;
-        $workers = $this->workers;
-
-        // 日付
-        $ddd = Carbon::parse($report->day);
-        $day = isset($report->day) ? DatetimeUtility::date('Jk年n月j日', $ddd->timestamp) : '';
-
-        // 作業員情報を詰めて生成
-        $workerlists = [];
-        $cnt = 0;
-        $keynum = 0;
-        foreach ($report->reportworkings as $working) {
-            if (isset($working->worker_id)) {
-                $workerlists[$keynum][] = [
-                    'name' => $working->worker->name,
-                    'tobidoko' => config('const.TOBI_DOKO_KBN_SHORT.' . $working->tobidoko),
-                    'sozan' => $working->sozan,
-                ];
-
-                // 6件ごとに配列キー増加
-                $cnt++;
-                if ($cnt >= 6) {
-                    $cnt = 0;
-                    $keynum++;
-                }
-            }
+        // 更新対象データ
+        $time_1 = NULL;
+        if ($request->input('time_1') != '') {
+            $time_1 = substr($request->input('time_1'), 0, 2) . ':' . substr($request->input('time_1'), 2, 2);
         }
-
-        // 運転者情報を詰めて生成
-        $driverlists = [];
-        $cnt = 0;
-        $keynum = 0;
-        foreach ($report->reportdrivers as $driver) {
-            if (isset($driver->worker_id)) {
-                $driverlists[$keynum][] = ['name' => $driver->worker->name];
-
-                // 6件ごとに配列キー増加
-                $cnt++;
-                if ($cnt >= 6) {
-                    $cnt = 0;
-                    $keynum++;
-                }
-            }
+        $time_2 = NULL;
+        if ($request->input('time_2') != '') {
+            $time_2 = substr($request->input('time_2'), 0, 2) . ':' . substr($request->input('time_2'), 2, 2);
+        }
+        $time_3 = NULL;
+        if ($request->input('time_3') != '') {
+            $time_3 = substr($request->input('time_3'), 0, 2) . ':' . substr($request->input('time_3'), 2, 2);
+        }
+        $time_4 = NULL;
+        if ($request->input('time_4') != '') {
+            $time_4 = substr($request->input('time_4'), 0, 2) . ':' . substr($request->input('time_4'), 2, 2);
+        }
+        $time_5 = NULL;
+        if ($request->input('time_5') != '') {
+            $time_5 = substr($request->input('time_5'), 0, 2) . ':' . substr($request->input('time_5'), 2, 2);
+        }
+        $time_6 = NULL;
+        if ($request->input('time_6') != '') {
+            $time_6 = substr($request->input('time_6'), 0, 2) . ':' . substr($request->input('time_6'), 2, 2);
         }
 
 
-        $pdf = \PDF::loadView('admin.report.pdf', compact('report', 'companies', 'sites', 'workers', 'day', 'workerlists', 'driverlists'));
-        $pdf->setPaper('A4');  // 縦向き
-        //$pdf->setPaper('A4', 'landscape');  // 横向き
-        //return $pdf->stream();
-        return $pdf->download('作業証明書_' . $report->company->name . '_' . $report->site->name . '_' . $report->day->format('ymd') . '.pdf');
+        $updarr = [
+            'day' => $request->input('day'),
+            'client_id' => Auth::id(),
+            'employee_id' => $request->input('employee_id'),
+            'time_1' => $time_1,
+            'time_2' => $time_2,
+            'time_3' => $time_3,
+            'time_4' => $time_4,
+            'time_5' => $time_5,
+            'time_6' => $time_6,
+            'memo_1' => $request->input('memo_1'),
+            'memo_2' => $request->input('memo_2'),
+            'memo_3' => $request->input('memo_3'),
+            'memo_4' => $request->input('memo_4'),
+            'memo_5' => $request->input('memo_5'),
+            'memo_6' => $request->input('memo_6'),
+            'lat_1' => $request->input('lat_1'),
+            'lat_2' => $request->input('lat_2'),
+            'lat_3' => $request->input('lat_3'),
+            'lat_4' => $request->input('lat_4'),
+            'lat_5' => $request->input('lat_5'),
+            'lat_6' => $request->input('lat_6'),
+            'lon_1' => $request->input('lon_1'),
+            'lon_2' => $request->input('lon_2'),
+            'lon_3' => $request->input('lon_3'),
+            'lon_4' => $request->input('lon_4'),
+            'lon_5' => $request->input('lon_5'),
+            'lon_6' => $request->input('lon_6'),
+        ];
+
+        Kintai::updateOrCreate(
+            ['id' => $id],
+            $updarr,
+        );
+
+        // CSRFトークンを再生成して、二重送信対策
+        $request->session()->regenerateToken();
+
+        return redirect( route('client.kintai.index') );
     }
+
+
+
 }

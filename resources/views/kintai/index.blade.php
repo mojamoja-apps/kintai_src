@@ -45,6 +45,7 @@
                             <label for="midnight" class="custom-control-label">前日分の退勤として打刻する</label>
                         </div>
                         @endif
+                        <textarea class="form-control" placeholder="備考" rows="3" id="memo" name="memo" maxlength="300"></textarea>
                     </div>
                 </div>
                 <div class="overlay dark" id="overlay_spin" style="display: none;">

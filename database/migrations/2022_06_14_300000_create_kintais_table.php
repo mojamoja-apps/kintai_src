@@ -26,7 +26,6 @@ return new class extends Migration
             $table->time("time_4")->nullable()->comment("休憩開始2");
             $table->time("time_5")->nullable()->comment("休憩終了2");
             $table->time("time_6")->nullable()->comment("勤務終了");
-            $table->boolean('midnight')->default(false)->comment('深夜残業 前日分の退勤として打刻チェック');
             $table->double('lat_1', 10, 6)->nullable()->comment('緯度-勤務開始');
             $table->double('lon_1', 10, 6)->nullable()->comment('経度-勤務開始');
             $table->double('lat_2', 10, 6)->nullable()->comment('緯度-休憩開始1');
@@ -39,8 +38,13 @@ return new class extends Migration
             $table->double('lon_5', 10, 6)->nullable()->comment('経度-休憩終了2');
             $table->double('lat_6', 10, 6)->nullable()->comment('緯度-勤務終了');
             $table->double('lon_6', 10, 6)->nullable()->comment('経度-勤務終了');
-
-
+            $table->text('memo_1')->nullable()->comment('メモ1');
+            $table->text('memo_2')->nullable()->comment('メモ2');
+            $table->text('memo_3')->nullable()->comment('メモ3');
+            $table->text('memo_4')->nullable()->comment('メモ4');
+            $table->text('memo_5')->nullable()->comment('メモ5');
+            $table->text('memo_6')->nullable()->comment('メモ6');
+            $table->boolean('midnight')->default(false)->comment('深夜残業 前日分の退勤として打刻チェック');
             $table->timestamps();
         });
 

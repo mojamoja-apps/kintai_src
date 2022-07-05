@@ -92,6 +92,7 @@ function fn_send(position) {
                 data: {
                     "_token" : CSRF_TOKEN,
                     "employee_id" : $('#employee').val(),
+                    "memo" : $('#memo').val(),
                     "dakokumode" : dakokumode,
                     "midnight" : $("#midnight").prop("checked"),
                     "lat" : lat,

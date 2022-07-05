@@ -7,6 +7,10 @@
 @stop
 
 @section('content')
+<div class="form-group mt-15">
+    <button type="button" class="btn btn-primary" onclick="location.href='{{ route('client.kintai.edit') }}'">新規登録</button>
+</div>
+
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
@@ -51,6 +55,12 @@
                                         >{{$employee->name}}</option>
 @endforeach
                                     </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>フリーワード検索</label>
+                                    <input type="search" class="form-control" placeholder="スペース区切りで複数キーワード" name="keyword" value="{{$search['keyword']}}">
                                 </div>
                             </div>
                         </div>

@@ -10,21 +10,22 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-6">
-            <div class="card card-primary">
-
-                @if ($mode == config('const.editmode.create'))
-                {{Form::open(['method'=>'post', 'id'=>'edit_form', 'route' => 'client.kintai.update'])}}
-                @else
-                {{Form::open(['method'=>'post', 'id'=>'edit_form', 'route' => ['client.kintai.update', $kintai->id] ])}}
-                @endif
+            @if ($mode == config('const.editmode.create'))
+            {{Form::open(['method'=>'post', 'id'=>'edit_form', 'route' => 'client.kintai.update'])}}
+            @else
+            {{Form::open(['method'=>'post', 'id'=>'edit_form', 'route' => ['client.kintai.update', $kintai->id] ])}}
+            @endif
+                <div class="card card-primary">
                     <input type="hidden" name="mode" id="mode" value="{{ $mode }}">
+                    <input type="hidden" name="client_id" id="client_id" value="{{ Auth::id() }}">
+                    <input type="hidden" name="id" id="id" value="{{ $kintai->id }}">
 
 
 
                     <div class="card-body">
                         <div class="form-group">
                             <label for="name">日付</label>
-                            <div class="input-group col-lg-3 col-md-5 col-sm-6">
+                            <div class="input-group col-lg-4 col-md-5 col-sm-6">
                                 <input type="text" class="form-control" name="day" id="day" value="{{ old('day', ($kintai->day != null ? $kintai->day->format('Y/m/d') : '') ) }}"
                                 @if ($mode == config('const.editmode.edit'))
                                 readonly
@@ -44,7 +45,7 @@
 
                         <div class="form-group">
                             <label for="code">社員</label>
-                            <select name="employee" id="employee" class="form-control select2"
+                            <select name="employee_id" id="employee_id" class="form-control select2"
                             @if ($mode == config('const.editmode.edit'))
                             readonly
                             @endif
@@ -69,7 +70,12 @@
 @php
     // 可変変数->format がエラーになってしまうので
     // Carbonを使って先に定義しておいて 使う時にフォーマット
-    $dt = new \Carbon\Carbon($kintai->{"time_{$dakokukey}"});
+    if ($kintai->{"time_{$dakokukey}"} !== NULL) {
+        $dt = new \Carbon\Carbon($kintai->{"time_{$dakokukey}"});
+        $disptime = $dt->format('Hi');
+    } else {
+        $disptime = NULL;
+    }
 @endphp
                 <div class="card card-{{ config('const.dakokunames_themes.' . $dakokukey) }}">
                     <div class="card-header">
@@ -93,7 +99,7 @@
                             <div class="row">
                                 <div class="input-group col-4">
                                     <input type="text" class="form-control" name="time_{{ $dakokukey }}" id="time_{{ $dakokukey }}" placeholder="0930" maxlength="4"
-                                    value="{{ old("time_{$dakokukey}", $dt->format('Hi') ) }}">
+                                    value="{{ old("time_{$dakokukey}", $disptime ) }}">
                                     @if ($errors->has("time_{$dakokukey}"))
                                     <code>{{ $errors->first("time_{$dakokukey}") }}</code>
                                     @endif
@@ -124,8 +130,8 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="memo_1">メモ</label>
-                            <textarea class="form-control" name="memo_{{ $dakokukey }}" id="memo_{{ $dakokukey }}" placeholder="" maxlength="500" rows="4">{{ old("memo_{$dakokukey}", $kintai->memo_1) }}</textarea>
+                            <label for="memo_{{ $dakokukey }}">メモ</label>
+                            <textarea class="form-control" name="memo_{{ $dakokukey }}" id="memo_{{ $dakokukey }}" placeholder="" maxlength="500" rows="4">{{ old("memo_{$dakokukey}", $kintai->{"memo_{$dakokukey}"}) }}</textarea>
                             @if ($errors->has("memo_{$dakokukey}"))
                             <code>{{ $errors->first("memo_{$dakokukey}") }}</code>
                             @endif
@@ -141,8 +147,8 @@
                         <button type="submit" id="commit_btn" class="btn btn-primary">登録</button>
                         <button type="button" id="" class="btn btn-default back_btn float-right" onclick="location.href='{{ route('client.kintai.index') }}'">戻る</button>
                     </div>
-                {{ Form::close() }}
-            </div>
+                </div>
+            {{ Form::close() }}
         </div>
     </div>
 </div>
@@ -154,12 +160,16 @@
 @stop
 
 @section('css')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/base/jquery-ui.min.css">
 <link rel="stylesheet" href="{{ asset( cacheBusting('css/common.css') ) }}">
 @stop
 
 @section('js')
 <script src="{{ asset( cacheBusting('js/common.js') ) }}"></script>
 <script src="{{ asset( cacheBusting('js/client/kintai.js') ) }}"></script>
-</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/i18n/jquery.ui.datepicker-ja.min.js"></script>
+
 
 <@stop

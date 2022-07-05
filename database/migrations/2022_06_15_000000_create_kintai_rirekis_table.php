@@ -25,6 +25,7 @@ return new class extends Migration
             $table->boolean('midnight')->default(false)->comment('深夜残業 前日分の退勤として打刻チェック');
             $table->double('lat', 10, 6)->nullable()->comment('緯度');
             $table->double('lon', 10, 6)->nullable()->comment('経度');
+            $table->text('memo')->nullable()->comment('メモ');
 
             $table->timestamps();
         });

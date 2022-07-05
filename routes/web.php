@@ -13,7 +13,7 @@ use App\Http\Controllers\Client\ClientKintaiController;
 
 use App\Http\Controllers\Kintai\FrontKintaiController;
 
-use App\Http\Controllers\Api\ValidateController;
+use App\Http\Controllers\Api\ClientValidateController;
 
 /*
 |--------------------------------------------------------------------------
@@ -64,6 +64,9 @@ Route::middleware( ['auth'])->group(function () {
     Route::post('/client/kintai/destroy/{id}', [ClientKintaiController::class, 'destroy'])->name('client.kintai.destroy');
 
 });
+
+// API 作業証明書の重複チェック
+Route::post('/client/api/validate/kintai', [ClientValidateController::class, 'kintai'])->name('client.api.validate.kintai');
 
 
 require __DIR__.'/auth.php';
