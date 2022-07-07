@@ -63,6 +63,11 @@ Route::middleware( ['auth'])->group(function () {
     Route::post('/client/kintai/update/{id?}', [ClientKintaiController::class, 'update'])->name('client.kintai.update');
     Route::post('/client/kintai/destroy/{id}', [ClientKintaiController::class, 'destroy'])->name('client.kintai.destroy');
 
+    // 勤怠データDL
+    Route::get('/client/dl', [ClientKintaiController::class, 'dlindex'])->name('client.kintai.dlindex');
+    Route::post('/client/dl/smilecsv', [ClientKintaiController::class, 'smilecsv'])->name('client.kintai.smilecsv');
+
+
 });
 
 // API 作業証明書の重複チェック

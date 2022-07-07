@@ -241,6 +241,11 @@ return [
             'url'  => 'client/kintai',
             'icon' => 'fas fa-fw fa-clock',
         ],
+        [
+            'text' => '勤怠データDL',
+            'url'  => 'client/dl',
+            'icon' => 'fas fa-fw fa-table',
+        ],
     ],
 
     /*

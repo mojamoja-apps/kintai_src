@@ -21,7 +21,7 @@ class ClientKintaiController extends Controller
     public $employees;
 
     function __construct() {
-        $this->search_session_name = 'admin_kintai';
+        $this->search_session_name = 'client_kintai';
 
         // cardの開閉 全閉じ状態を初期値 必要に応じてオープン
         $collapse = config('const.COLLAPSE.CLOSE');
@@ -336,5 +336,105 @@ class ClientKintaiController extends Controller
     }
 
 
+
+
+
+
+
+
+
+
+
+
+    // ダウンロード メニュー
+    public function dlindex() {
+        // 西暦 今年～2022年まで
+        $years = [];
+        for ($ix = date('Y'); $ix >= 2022; $ix--) {
+            $years[$ix] = $ix;
+        }
+        $months = [];
+        for ($ix = 1; $ix <= 12; $ix++) {
+            $months[$ix] = $ix;
+        }
+
+        // セッションの値を全て取得
+        $session = session()->all();
+        $session = $session['kintai'] ?? [];
+
+        return view('client/kintai/dlindex', compact('years', 'months', 'session'));
+    }
+
+
+
+
+    // スマイル形式Excel出力
+    public function smilecsv(Request $request) {
+        $request->validate([
+            'year' => 'required',
+            'month' => 'required',
+        ]
+        ,[
+            'year.required' => '必須項目です。',
+            'month.required' => '必須項目です。',
+        ]);
+
+        $year = $request->input('year');
+        $month = $request->input('month');
+
+        // $workers = Worker::where('style', '=', '1')->orderBy('id', 'asc')->get();  // 1:正社員
+        // $parts = Worker::where('style', '=', '2')->orderBy('id', 'asc')->get();  // 2:実習生
+
+        // セッションを一旦消して検索値を保存
+        $session = $request->session()->get('kintai');
+        $search = [];
+        $search['year'] = $request->input('year');
+        $search['month'] = $request->input('month');
+        $request->session()->forget('kintai');
+        $request->session()->put('kintai',$search);
+
+
+
+        //対象年月の26日～翌月25日を求める
+        // $start = new Carbon("{$year}/{$month}/26");
+        // $end = new Carbon("{$year}/{$month}/01");
+        // $end->addMonthsNoOverflow(1);
+        // $nextmonth = $end->month;
+        // $end = new Carbon("{$year}/{$nextmonth}/25");
+
+
+        // ダウンロード完了でリダイレクト用クッキー
+        setcookie("downloaded", 1, time()+5);
+
+
+        // データの作成
+        $users = [
+            ['name' => '太郎', 'age' => 24],
+            ['name' => '花子', 'age' => 21]
+        ];
+        // カラムの作成
+        $head = ['名前', '年齢'];
+
+        $stream = fopen('php://temp', 'w');
+        $data = [];
+        mb_convert_variables('SJIS', 'UTF-8', $head);
+        fputcsv($stream, $head);
+        foreach ($users as $user) {
+            mb_convert_variables('SJIS', 'UTF-8', $user);
+            fputcsv($stream, $user);
+        }
+        rewind($stream); //注意：fpassthru() する前にもファイルポインタは戻しておく
+
+        return response()->stream(function () use ($stream) { //修正 2. ストリームのままCSV出力できるようにする
+            fpassthru($stream);
+            fclose($stream);
+        }, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=t_logs.csv"
+        ]);
+
+        //return view('user.index', compact('users'));
+
+    }
 
 }
