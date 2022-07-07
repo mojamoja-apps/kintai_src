@@ -89,7 +89,27 @@ class FrontKintaiController extends Controller
         // 既存レコード存在チェック
         $dt = Carbon::now();
         $day = $dt->format('Y/m/d');
-        $time = $dt->format('H:i:s');
+        $time = $dt->format('H:i:00');  // 今がなんであれ、打刻は0秒とすること
+
+        // 前日分の退勤として打刻する
+        $midnight = 0;
+        if (
+            $request->input('dakokumode') == config('const.dakokumode.taikin')
+            && $request->input('midnight') === 'true'
+        ) {
+            // ajaxの真偽値は文字列として'true' 'false' が来るので注意して判定
+
+            // 日付は前日分にする
+            // 日付はそのまま
+            // 深夜フラグを立てておく
+            $dt = new Carbon('yesterday'); // 昨日
+            $day = $dt->format('Y/m/d');
+
+            $midnight = 1;
+        }
+
+
+
 
         $kintai = Kintai::
                     where('client_id', $client->id)
@@ -113,14 +133,8 @@ class FrontKintaiController extends Controller
         $memo_column = 'memo_' . $request->input('dakokumode');
 
         // 更新対象データ
-        $midnight = 0;
-        if (
-            $request->input('dakokumode') == config('const.dakokumode.taikin')
-            && $request->input('midnight') === 'true'
-        ) {
-            // ajaxの真偽値は文字列として'true' 'false' が来るので注意して判定
-            $midnight = 1;
-        }
+
+
 
         $updarr = [
             'client_id' => $client->id,

@@ -51,6 +51,21 @@ function fn_basic_auth($auth_list,$realm="Restricted Area",$failed_text="HTTP/1.
 * @param number 切り捨て対象数値
 * @return number 切り捨て後数値
 */
-function floor_reitengo($num) {
+function reitengo_floor($num) {
     return floor($num * 2) /2;
+}
+
+/**
+* 休憩時間数 0.5単位で切り上げ
+  2倍して小数点以下切り上げ、割る2
+  8.1→8.5
+  7.9→8
+  7.4→7.5
+  1.6→2
+*
+* @param number 切り上げ対象数値
+* @return number 切り上げ後数値
+*/
+function reitengo_ceil($num) {
+    return ceil($num * 2) /2;
 }

@@ -162,21 +162,58 @@ class ClientKintaiController extends Controller
             ) {
                 $st = Carbon::parse($val['time_1']);
                 $ed = Carbon::parse($val['time_6']);
-                $st->diffInHours($ed);
-                //$day = DatetimeUtility::date('Y/m/d H:i:s', $ddd->timestamp);
-                //dd($st->diffInHours($ed));
+
+                // 深夜残業だったら 01時などと保存されているので +1日した01時として考える
+                if ($val['midnight']) {
+                    $ed->addDay(); // 1日後
+                }
+
+                $rest_1_hour = 0;
+                $rest_2_hour = 0;
+                $minutes_1 = 0;
+                $minutes_2 = 0;
+                if (Auth::user()->rest == 2 || Auth::user()->rest == 3) {
+                    if (
+                        $val['time_2'] !== NULL
+                        && $val['time_3'] !== NULL
+                    ) {
+                        $rest_1_st = Carbon::parse($val['time_2']);
+                        $rest_1_ed = Carbon::parse($val['time_3']);
+                        $minutes_1 = $rest_1_st->diffInMinutes($rest_1_ed);
+                        $rest_1_hour = reitengo_ceil($minutes_1 / 60);  // 休憩は0.5ごとに切り上げ
+                    }
+                }
+                if (Auth::user()->rest == 3) {
+                    if (
+                        $val['time_4'] !== NULL
+                        && $val['time_5'] !== NULL
+                    ) {
+                        $rest_2_st = Carbon::parse($val['time_4']);
+                        $rest_2_ed = Carbon::parse($val['time_5']);
+                        $minutes_2 = $rest_2_st->diffInMinutes($rest_2_ed);
+                        $rest_2_hour = reitengo_ceil($minutes_2 / 60);  // 休憩は0.5ごとに切り上げ
+                    }
+                }
+
                 $minutes = $st->diffInMinutes($ed);
-                $val['work_hour'] = floor_reitengo($minutes / 60);
+                $work_hour = reitengo_floor($minutes / 60);   // 勤務時間は0.5ごとに切り捨て
+
+                $val['work_hour'] = $work_hour - $rest_1_hour - $rest_2_hour;
+                $val['hourfull'] = $work_hour;
+                $val['hour1'] = $rest_1_hour;
+                $val['hour2'] = $rest_2_hour;
+                $val['minute1'] = $minutes_1;
+                $val['minute2'] = $minutes_2;
             } else {
                 $val['work_hour'] = NULL;
             }
             return $val;
         });
 
-// foreach ($kintais as $key => $kintai) {
-// ddd($kintai);
-//     # code...
-// }
+//   foreach ($kintais as $key => $kintai) {
+//   dd($kintai);
+//       # code...
+//   }
         return view('client/kintai/index', compact('kintais', 'search', 'collapse', 'employees'));
     }
 

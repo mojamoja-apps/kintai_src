@@ -1,5 +1,10 @@
 $(function(){
 
+    // 一覧画面 カレンダー
+    $('#day_st, #day_ed').datepicker({
+        //showButtonPanel: true,
+    });
+
     // カレンダー 新規モードのみ
     if ($("#mode").val() == _MODE_CREATE) {
         $('#day').datepicker({
