@@ -182,6 +182,10 @@ class AdminClientController extends Controller
         if ($request->input('midnight')) {
             $midnight = 1;
         }
+        $smile_csv = 0;
+        if ($request->input('smile_csv')) {
+            $smile_csv = 1;
+        }
         $updarr = [
             'name' => $request->input('name'),
             'is_enabled' => $is_enabled,
@@ -198,6 +202,7 @@ class AdminClientController extends Controller
             'gps' => $gps,
             'rest' => $request->input('rest'),
             'midnight' => $midnight,
+            'smile_csv' => $smile_csv,
         ];
         // パスワードの入力がある場合は更新対象に含める
         if ($request->input('password') !== null) {

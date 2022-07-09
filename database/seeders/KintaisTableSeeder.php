@@ -27,6 +27,7 @@ class KintaisTableSeeder extends Seeder
                         'time_4' => '15:00',
                         'time_5' => '15:30',
                         'time_6' => '18:00',
+                        'work_hour' => '8',
                         'created_at' => date('Y-m-d H:i:s'),
                         'updated_at' => date('Y-m-d H:i:s'),
                     ]

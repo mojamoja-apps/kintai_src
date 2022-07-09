@@ -10,14 +10,9 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-6">
-
             <div class="card card-default">
-                <div class="card-header">
-                    <h3 class="card-title">スマイル形式CSV</h3>
-                </div>
 
-
-                {{Form::open(['method'=>'post', 'files' => true, 'id'=>'edit_form', 'route' => 'client.kintai.smilecsv'])}}
+                {{Form::open(['method'=>'post', 'files' => true, 'id'=>'edit_form'])}}
                     <div class="card-body">
                         <div class="form-group">
                             <label for="exampleInputEmail1">年月</label>
@@ -39,8 +34,9 @@
                     </div>
 
                     <div class="card-footer">
-                        <button type="submit" id="commit_btn" class="btn btn-primary">出力</button>
-                        <code>ダウンロードまでに時間がかかりますが一度だけクリックしてお待ちください。</code>
+                        <button type="button" id="" data-mode="excel" class="commit_btn btn btn-primary">Excel形式出力</button>
+                        <button type="button" id="" data-mode="smile_csv" class="commit_btn btn btn-info">スマイル形式CSV出力</button>
+                        <p><code>ダウンロードまでに時間がかかりますが一度だけクリックしてお待ちください。</code></p>
                     </div>
 
                 {{ Form::close() }}
@@ -50,6 +46,8 @@
                     <i class="fas fa-2x fa-sync-alt fa-spin"></i>
                 </div>
             </div>
+
+
         </div>
     </div>
 </div>
@@ -68,6 +66,15 @@
 
 <script>
 $(function(){
+    $('.commit_btn').click(function (e) {
+        if ($(this).data('mode') == 'excel') {
+            ac = '{{ route('client.kintai.excel') }}';
+        } else if ($(this).data('mode') == 'smile_csv') {
+            ac = '{{ route('client.kintai.smilecsv') }}';
+        }
+        $("#edit_form").attr('action', ac);
+        $("#edit_form").submit();
+    });
 
     $("#edit_form").submit(function (e) {
         setInterval(function () {
@@ -78,7 +85,7 @@ $(function(){
         }, 1000);
 
         $("#overlay_spin").show();
-        $("#commit_btn").prop("disabled", true);
+        $(".commit_btn").prop("disabled", true);
     });
 })
 </script>

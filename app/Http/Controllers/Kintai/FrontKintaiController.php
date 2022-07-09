@@ -10,6 +10,7 @@ use App\Models\Kintai;
 use App\Models\Kintai_rireki;
 use App\Services\ClientService;
 use App\Services\EmployeeService;
+use App\Services\KintaiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -126,16 +127,13 @@ class FrontKintaiController extends Controller
         }
 
 
-         // 対象カラム モードにより1～6
+        // 対象カラム モードにより1～6
         $time_column = 'time_' . $request->input('dakokumode');
         $lat_column = 'lat_' . $request->input('dakokumode');
         $lon_column = 'lon_' . $request->input('dakokumode');
         $memo_column = 'memo_' . $request->input('dakokumode');
 
         // 更新対象データ
-
-
-
         $updarr = [
             'client_id' => $client->id,
             'employee_id' => $request->input('employee_id'),
@@ -152,6 +150,9 @@ class FrontKintaiController extends Controller
             $updarr,
         );
 
+        // 勤務時間を再計算
+        $kintaiService = New KintaiService();
+        $kintaiService->calcAndUpdateWorkHour($result->id);
 
         //打刻履歴テーブルも作る
         $updarr = [
@@ -170,16 +171,6 @@ class FrontKintaiController extends Controller
         $request->session()->regenerateToken();
 
         return response()->json(['result' => true, 'error_code' => '0', 'error_message' => '']);
-    }
-
-    public function destroy(Request $request, $id) {
-        $report = Report::find($id);
-        $report->delete();
-
-        // CSRFトークンを再生成して、二重送信対策
-        $request->session()->regenerateToken();
-
-        return redirect( route('report.index') );
     }
 
 

@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\Kintai;
 use App\Services\ClientService;
 use App\Services\EmployeeService;
+use App\Services\KintaiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +15,13 @@ use Auth;
 
 use Carbon\Carbon;
 use App\Services\DatetimeUtility;
+
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Shared\File;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Style;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class ClientKintaiController extends Controller
 {
@@ -154,62 +162,6 @@ class ClientKintaiController extends Controller
             config('const.max_get')
         )->get();
 
-        // 勤務時間を計算
-        $kintais->map(function ($val) {
-            if (
-                $val['time_1'] !== NULL
-                && $val['time_6'] !== NULL
-            ) {
-                $st = Carbon::parse($val['time_1']);
-                $ed = Carbon::parse($val['time_6']);
-
-                // 深夜残業だったら 01時などと保存されているので +1日した01時として考える
-                if ($val['midnight']) {
-                    $ed->addDay(); // 1日後
-                }
-
-                $rest_1_hour = 0;
-                $rest_2_hour = 0;
-                $minutes_1 = 0;
-                $minutes_2 = 0;
-                if (Auth::user()->rest == 2 || Auth::user()->rest == 3) {
-                    if (
-                        $val['time_2'] !== NULL
-                        && $val['time_3'] !== NULL
-                    ) {
-                        $rest_1_st = Carbon::parse($val['time_2']);
-                        $rest_1_ed = Carbon::parse($val['time_3']);
-                        $minutes_1 = $rest_1_st->diffInMinutes($rest_1_ed);
-                        $rest_1_hour = reitengo_ceil($minutes_1 / 60);  // 休憩は0.5ごとに切り上げ
-                    }
-                }
-                if (Auth::user()->rest == 3) {
-                    if (
-                        $val['time_4'] !== NULL
-                        && $val['time_5'] !== NULL
-                    ) {
-                        $rest_2_st = Carbon::parse($val['time_4']);
-                        $rest_2_ed = Carbon::parse($val['time_5']);
-                        $minutes_2 = $rest_2_st->diffInMinutes($rest_2_ed);
-                        $rest_2_hour = reitengo_ceil($minutes_2 / 60);  // 休憩は0.5ごとに切り上げ
-                    }
-                }
-
-                $minutes = $st->diffInMinutes($ed);
-                $work_hour = reitengo_floor($minutes / 60);   // 勤務時間は0.5ごとに切り捨て
-
-                $val['work_hour'] = $work_hour - $rest_1_hour - $rest_2_hour;
-                $val['hourfull'] = $work_hour;
-                $val['hour1'] = $rest_1_hour;
-                $val['hour2'] = $rest_2_hour;
-                $val['minute1'] = $minutes_1;
-                $val['minute2'] = $minutes_2;
-            } else {
-                $val['work_hour'] = NULL;
-            }
-            return $val;
-        });
-
 //   foreach ($kintais as $key => $kintai) {
 //   dd($kintai);
 //       # code...
@@ -324,10 +276,15 @@ class ClientKintaiController extends Controller
             'lon_6' => $request->input('lon_6'),
         ];
 
-        Kintai::updateOrCreate(
+        $result = Kintai::updateOrCreate(
             ['id' => $id],
             $updarr,
         );
+
+
+        // 勤務時間を再計算
+        $kintaiService = New KintaiService();
+        $kintaiService->calcAndUpdateWorkHour($result->id);
 
         // CSRFトークンを再生成して、二重送信対策
         $request->session()->regenerateToken();
@@ -336,6 +293,24 @@ class ClientKintaiController extends Controller
     }
 
 
+
+
+    public function destroy(Request $request, $id) {
+
+        $query = Kintai::query();
+        $query->where('id', $id);
+        $query->where('client_id', Auth::id());
+        $select = $query->firstOrFail();
+
+        $kintai = Kintai::find($select->id);
+        $kintai->delete();
+
+
+        // CSRFトークンを再生成して、二重送信対策
+        $request->session()->regenerateToken();
+
+        return redirect( route('client.kintai.index') );
+    }
 
 
 
@@ -368,8 +343,8 @@ class ClientKintaiController extends Controller
 
 
 
-    // スマイル形式Excel出力
-    public function smilecsv(Request $request) {
+    // Excel出力
+    public function excel(Request $request) {
         $request->validate([
             'year' => 'required',
             'month' => 'required',
@@ -381,6 +356,12 @@ class ClientKintaiController extends Controller
 
         $year = $request->input('year');
         $month = $request->input('month');
+
+        $dt = new Carbon("{$year}/{$month}/01");
+        $start = $dt->startOfMonth()->toDateString();
+        $dt = new Carbon("{$year}/{$month}/01");
+        $end = $dt->endOfMonth()->toDateString();
+
 
         // $workers = Worker::where('style', '=', '1')->orderBy('id', 'asc')->get();  // 1:正社員
         // $parts = Worker::where('style', '=', '2')->orderBy('id', 'asc')->get();  // 2:実習生
@@ -394,47 +375,179 @@ class ClientKintaiController extends Controller
         $request->session()->put('kintai',$search);
 
 
+        // Excel用意
+        $spreadsheet = IOFactory::load(resource_path() . '/excel/kintai_template.xlsx');
+        // 作業シート
+        $sheet = $spreadsheet->getActiveSheet();
 
-        //対象年月の26日～翌月25日を求める
-        // $start = new Carbon("{$year}/{$month}/26");
-        // $end = new Carbon("{$year}/{$month}/01");
-        // $end->addMonthsNoOverflow(1);
-        // $nextmonth = $end->month;
-        // $end = new Carbon("{$year}/{$nextmonth}/25");
 
+
+        // 勤怠情報を取得
+        $query = Kintai::query();
+        $query->select(
+            'kintais.*',
+            'employees.id AS emp_id',
+        );
+        $query->where('kintais.client_id', Auth::id());
+
+        // 社員の並び順にしたいので社員マスタをjoin
+        $query->leftJoin('employees', 'kintais.employee_id', '=', 'employees.id');
+
+        $query->whereDate('day', '>=', $start);
+        $query->whereDate('day', '<=', $end);
+
+        $kintais = $query->orderBy('day', 'ASC')->orderBy('order', 'ASC')->orderBy('employees.id', 'ASC')->get();
+
+
+        if (Auth::user()->rest == 1) {
+            $dakoku_names = config('const.dakokunames_rest_1');
+        } else if (Auth::user()->rest == 2) {
+            $dakoku_names = config('const.dakokunames_rest_2');
+        } else if (Auth::user()->rest == 3) {
+            $dakoku_names = config('const.dakokunames_rest_3');
+        }
+        foreach ($dakoku_names as $value) {
+            $head[] = $value;
+        }
+
+        // Excel2行目からスタート
+        $row = 2;
+        foreach ($kintais as $kintai) {
+
+            $sheet->setCellValue("A{$row}", $kintai->day->format('Y/m/d'));
+            $sheet->setCellValue("B{$row}", $kintai->employee->code);
+            $sheet->setCellValue("C{$row}", $kintai->employee->name);
+            $sheet->setCellValue("D{$row}", $kintai->work_hour);
+            $sheet->setCellValue("E{$row}", $kintai->time_1 !== null ? $kintai->time_1->format('H:i') : '');
+            $sheet->setCellValue("F{$row}", $kintai->time_2 !== null ? $kintai->time_2->format('H:i') : '');
+            $sheet->setCellValue("G{$row}", $kintai->time_3 !== null ? $kintai->time_3->format('H:i') : '');
+            $sheet->setCellValue("H{$row}", $kintai->time_4 !== null ? $kintai->time_4->format('H:i') : '');
+            $sheet->setCellValue("I{$row}", $kintai->time_5 !== null ? $kintai->time_5->format('H:i') : '');
+            $sheet->setCellValue("J{$row}", $kintai->time_6 !== null ? $kintai->time_6->format('H:i') : '');
+            // if (Auth::user()->rest == 1) {
+            //     $arr[] = $kintai->time_1;
+            //     $arr[] = $kintai->time_6;
+            // } else if (Auth::user()->rest == 2) {
+            //     $arr[] = $kintai->time_1;
+            //     $arr[] = $kintai->time_2;
+            //     $arr[] = $kintai->time_3;
+            //     $arr[] = $kintai->time_6;
+            // } else if (Auth::user()->rest == 3) {
+            //     $arr[] = $kintai->time_1;
+            //     $arr[] = $kintai->time_2;
+            //     $arr[] = $kintai->time_3;
+            //     $arr[] = $kintai->time_4;
+            //     $arr[] = $kintai->time_5;
+            //     $arr[] = $kintai->time_6;
+            // }
+            $row++;
+        }
+
+        File::setUseUploadTempDirectory(resource_path());
+
+        $tmpfile = '/excel/kintai' . Auth::id() . '.xlsx';
+        $writer = new Xlsx($spreadsheet);
+        $writer->save(resource_path() . $tmpfile);
 
         // ダウンロード完了でリダイレクト用クッキー
         setcookie("downloaded", 1, time()+5);
 
+        return response()->download(resource_path() . $tmpfile, 'kintai_' . $year . sprintf('%02d', $month) . '.xlsx',
+                               ['content-type' => 'application/vnd.ms-excel',])
+                         ->deleteFileAfterSend(true);
+    }
 
-        // データの作成
-        $users = [
-            ['name' => '太郎', 'age' => 24],
-            ['name' => '花子', 'age' => 21]
-        ];
+
+
+    // スマイル形式csv
+    public function smilecsv(Request $request) {
+        $request->validate([
+            'year' => 'required',
+            'month' => 'required',
+        ]
+        ,[
+            'year.required' => '必須項目です。',
+            'month.required' => '必須項目です。',
+        ]);
+
+        $year = $request->input('year');
+        $month = $request->input('month');
+
+        // 月初・月末
+        $dt = new Carbon("{$year}/{$month}/01");
+        $start = $dt->startOfMonth()->toDateString();
+        $dt = new Carbon("{$year}/{$month}/01");
+        $end = $dt->endOfMonth()->toDateString();
+
+        // セッションを一旦消して検索値を保存
+        $session = $request->session()->get('kintai');
+        $search = [];
+        $search['year'] = $request->input('year');
+        $search['month'] = $request->input('month');
+        $request->session()->forget('kintai');
+        $request->session()->put('kintai',$search);
+
+
+
+
+
+
+        // 勤怠情報を取得
+        $query = Kintai::query();
+        $query->select(
+            'employees.code',
+            'employees.order',
+            DB::raw('SUM(kintais.work_hour) as work_hour_sum'),
+        );
+        $query->groupBy(
+            'employees.code',
+            'employees.order',
+        );
+        $query->where('kintais.client_id', Auth::id());
+
+        // 社員の並び順にしたいので社員マスタをjoin
+        $query->leftJoin('employees', 'kintais.employee_id', '=', 'employees.id');
+
+        $query->whereDate('day', '>=', $start);
+        $query->whereDate('day', '<=', $end);
+
+        $kintais = $query->orderBy('order', 'ASC')->get();
+
         // カラムの作成
-        $head = ['名前', '年齢'];
+        $head = ['社員コード', '年度', '給与賞与区分', '支給月', '勤怠項目1'];
 
         $stream = fopen('php://temp', 'w');
         $data = [];
-        mb_convert_variables('SJIS', 'UTF-8', $head);
+        mb_convert_variables('SJIS-win', 'UTF-8', $head);
         fputcsv($stream, $head);
-        foreach ($users as $user) {
-            mb_convert_variables('SJIS', 'UTF-8', $user);
-            fputcsv($stream, $user);
+        foreach ($kintais as $kintai) {
+            $arr = [];
+            $arr[] = $kintai->code;
+            $arr[] = $year;
+            $arr[] = '1';
+            $arr[] = $month;
+            $arr[] = $kintai->work_hour_sum;
+            mb_convert_variables('SJIS-win', 'UTF-8', $arr);
+            fputcsv($stream, $arr);
         }
         rewind($stream); //注意：fpassthru() する前にもファイルポインタは戻しておく
+
+        // ダウンロード完了でリダイレクト用クッキー
+        setcookie("downloaded", 1, time()+5);
+
 
         return response()->stream(function () use ($stream) { //修正 2. ストリームのままCSV出力できるようにする
             fpassthru($stream);
             fclose($stream);
         }, 200, [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => "attachment; filename=t_logs.csv"
+            'Content-Disposition' => "attachment; filename=smile_" . $year . sprintf('%02d', $month) . ".csv"
         ]);
 
         //return view('user.index', compact('users'));
 
     }
+
+
 
 }

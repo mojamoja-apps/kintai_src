@@ -162,3 +162,35 @@ $(function(){
     });
 
 })
+
+
+
+
+
+
+// 一覧での削除ボタン action先を指定
+function deleteData(param) {
+    $('#delete_form').attr('action', param);
+    $('#delete_form').submit();
+}
+$('#delete_form').validate({
+    submitHandler: function (form) {
+        Swal.fire({
+            title: '削除します。<br>よろしいでしょうか?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'OK',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // ボタン無効 二重送信防止
+                $(".delete_btn").prop("disabled", true);
+                form.submit();
+            } else {
+                return false;
+            }
+        });
+    }
+});
+
+
+

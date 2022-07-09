@@ -142,6 +142,7 @@
                                 <td class="text-right">{{ $kintai->work_hour }}</td>
                                 <td class="text-center">
                                     <button type="button" class="btn btn-primary" onclick="location.href='{{route('client.kintai.edit',['id' => $kintai->id])}}'">詳細</button>
+                                    <button type="button" class="btn btn-danger delete_btn" onclick="deleteData('{{ route('client.kintai.destroy',['id' => $kintai->id]) }}');">削除</button>
                                 </td>
                             </tr>
                         @endforeach
@@ -159,8 +160,8 @@
 {{Form::open(['method'=>'post', 'id'=>'search_clear_form'])}}
 {{ Form::close() }}
 
-{{-- PDF出力用フォーム --}}
-{{Form::open(['method'=>'post', 'id'=>'pdf_form'])}}
+{{-- 削除ボタン用フォーム --}}
+{{Form::open(['method'=>'post', 'id'=>'delete_form'])}}
 {{ Form::close() }}
 
 

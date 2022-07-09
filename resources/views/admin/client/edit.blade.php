@@ -190,6 +190,19 @@
                             </div>
                         </div>
 
+
+                        <div class="form-group">
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="smile_csv" name="smile_csv" value="1"
+                                    @if ((int)old('smile_csv') == 1) checked
+                                    @elseif ($client->smile_csv == 1) checked
+                                    @elseif ($mode == config('const.editmode.create')) checked
+                                    @endif
+                                >
+                                    <label class="custom-control-label" for="smile_csv">スマイル用csv出力利用</label>
+                            </div>
+                        </div>
+
                     </div>
 
                     <div class="card-footer">

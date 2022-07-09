@@ -65,6 +65,7 @@ Route::middleware( ['auth'])->group(function () {
 
     // 勤怠データDL
     Route::get('/client/dl', [ClientKintaiController::class, 'dlindex'])->name('client.kintai.dlindex');
+    Route::post('/client/dl/excel', [ClientKintaiController::class, 'excel'])->name('client.kintai.excel');
     Route::post('/client/dl/smilecsv', [ClientKintaiController::class, 'smilecsv'])->name('client.kintai.smilecsv');
 
 

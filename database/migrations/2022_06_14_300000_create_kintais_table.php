@@ -26,6 +26,7 @@ return new class extends Migration
             $table->time("time_4")->nullable()->comment("休憩開始2");
             $table->time("time_5")->nullable()->comment("休憩終了2");
             $table->time("time_6")->nullable()->comment("勤務終了");
+            $table->float('work_hour')->default(0)->comment('勤務時間');
             $table->double('lat_1', 10, 6)->nullable()->comment('緯度-勤務開始');
             $table->double('lon_1', 10, 6)->nullable()->comment('経度-勤務開始');
             $table->double('lat_2', 10, 6)->nullable()->comment('緯度-休憩開始1');
