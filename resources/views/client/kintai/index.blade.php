@@ -103,18 +103,18 @@
                                 <th>日付</th>
                                 <th>コード</th>
                                 <th>氏名</th>
-                                <th>出勤</th>
+                                <th>{{ config('const.dakokunames_rest_1.1') }}</th>
                                 @if (Auth::user()->rest == 2)
-                                <th>休憩開始</th>
-                                <th>休憩終了</th>
+                                <th>{{ config('const.dakokunames_rest_2.2') }}</th>
+                                <th>{{ config('const.dakokunames_rest_2.3') }}</th>
                                 @endif
                                 @if (Auth::user()->rest == 3)
-                                <th>休憩①開始</th>
-                                <th>休憩①終了</th>
-                                <th>休憩②開始</th>
-                                <th>休憩②終了</th>
+                                <th>{{ config('const.dakokunames_rest_3.2') }}</th>
+                                <th>{{ config('const.dakokunames_rest_3.3') }}</th>
+                                <th>{{ config('const.dakokunames_rest_3.4') }}</th>
+                                <th>{{ config('const.dakokunames_rest_3.5') }}</th>
                                 @endif
-                                <th>退勤</th>
+                                <th>{{ config('const.dakokunames_rest_1.6') }}</th>
                                 <th>勤務時間</th>
                                 <th></th>
                             </tr>

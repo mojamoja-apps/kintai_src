@@ -410,6 +410,30 @@ class ClientKintaiController extends Controller
             $head[] = $value;
         }
 
+
+        // ヘッダーセット
+        $row = 1;
+        $sheet->setCellValue("A{$row}", '日付');
+        $sheet->setCellValue("B{$row}", '社員コード');
+        $sheet->setCellValue("C{$row}", '氏名');
+        $sheet->setCellValue("D{$row}", '勤務時間');
+        $sheet->setCellValue("E{$row}", config('const.dakokunames_rest_1.1'));
+
+
+        if (Auth::user()->rest == 1) {
+            $sheet->setCellValue("F{$row}", config('const.dakokunames_rest_1.6'));
+        } else if (Auth::user()->rest == 2) {
+            $sheet->setCellValue("F{$row}", config('const.dakokunames_rest_2.2'));
+            $sheet->setCellValue("G{$row}", config('const.dakokunames_rest_2.3'));
+            $sheet->setCellValue("H{$row}", config('const.dakokunames_rest_2.6'));
+        } else if (Auth::user()->rest == 3) {
+            $sheet->setCellValue("F{$row}", config('const.dakokunames_rest_3.2'));
+            $sheet->setCellValue("G{$row}", config('const.dakokunames_rest_3.3'));
+            $sheet->setCellValue("H{$row}", config('const.dakokunames_rest_3.4'));
+            $sheet->setCellValue("I{$row}", config('const.dakokunames_rest_3.5'));
+            $sheet->setCellValue("J{$row}", config('const.dakokunames_rest_3.6'));
+        }
+
         // Excel2行目からスタート
         $row = 2;
         foreach ($kintais as $kintai) {
@@ -419,27 +443,19 @@ class ClientKintaiController extends Controller
             $sheet->setCellValue("C{$row}", $kintai->employee->name);
             $sheet->setCellValue("D{$row}", $kintai->work_hour);
             $sheet->setCellValue("E{$row}", $kintai->time_1 !== null ? $kintai->time_1->format('H:i') : '');
-            $sheet->setCellValue("F{$row}", $kintai->time_2 !== null ? $kintai->time_2->format('H:i') : '');
-            $sheet->setCellValue("G{$row}", $kintai->time_3 !== null ? $kintai->time_3->format('H:i') : '');
-            $sheet->setCellValue("H{$row}", $kintai->time_4 !== null ? $kintai->time_4->format('H:i') : '');
-            $sheet->setCellValue("I{$row}", $kintai->time_5 !== null ? $kintai->time_5->format('H:i') : '');
-            $sheet->setCellValue("J{$row}", $kintai->time_6 !== null ? $kintai->time_6->format('H:i') : '');
-            // if (Auth::user()->rest == 1) {
-            //     $arr[] = $kintai->time_1;
-            //     $arr[] = $kintai->time_6;
-            // } else if (Auth::user()->rest == 2) {
-            //     $arr[] = $kintai->time_1;
-            //     $arr[] = $kintai->time_2;
-            //     $arr[] = $kintai->time_3;
-            //     $arr[] = $kintai->time_6;
-            // } else if (Auth::user()->rest == 3) {
-            //     $arr[] = $kintai->time_1;
-            //     $arr[] = $kintai->time_2;
-            //     $arr[] = $kintai->time_3;
-            //     $arr[] = $kintai->time_4;
-            //     $arr[] = $kintai->time_5;
-            //     $arr[] = $kintai->time_6;
-            // }
+            if (Auth::user()->rest == 1) {
+                $sheet->setCellValue("F{$row}", $kintai->time_6 !== null ? $kintai->time_6->format('H:i') : '');
+            } else if (Auth::user()->rest == 2) {
+                $sheet->setCellValue("F{$row}", $kintai->time_2 !== null ? $kintai->time_2->format('H:i') : '');
+                $sheet->setCellValue("G{$row}", $kintai->time_3 !== null ? $kintai->time_3->format('H:i') : '');
+                $sheet->setCellValue("H{$row}", $kintai->time_6 !== null ? $kintai->time_6->format('H:i') : '');
+            } else if (Auth::user()->rest == 3) {
+                $sheet->setCellValue("F{$row}", $kintai->time_2 !== null ? $kintai->time_2->format('H:i') : '');
+                $sheet->setCellValue("G{$row}", $kintai->time_3 !== null ? $kintai->time_3->format('H:i') : '');
+                $sheet->setCellValue("H{$row}", $kintai->time_4 !== null ? $kintai->time_4->format('H:i') : '');
+                $sheet->setCellValue("I{$row}", $kintai->time_5 !== null ? $kintai->time_5->format('H:i') : '');
+                $sheet->setCellValue("J{$row}", $kintai->time_6 !== null ? $kintai->time_6->format('H:i') : '');
+            }
             $row++;
         }
 

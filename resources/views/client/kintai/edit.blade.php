@@ -125,9 +125,11 @@
                             <code>9時半の場合「0930」と4桁の数字で入力してください。</code>
                         </div>
 
+                        @if (Auth::user()->gps == true)
                         <div class="form-group">
-                            <button type="submit" id="to_map_btn" class="btn btn-primary">Googleマップで確認</button>
+                            <button type="button" id="" class="to_map_btn btn btn-primary" onclick="fn_open_map($('#lat_{{ $dakokukey }}').val(), $('#lon_{{ $dakokukey }}').val());">Googleマップで確認</button>
                         </div>
+                        @endif
 
                         <div class="form-group">
                             <label for="memo_{{ $dakokukey }}">メモ</label>

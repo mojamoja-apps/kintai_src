@@ -164,7 +164,15 @@ $(function(){
 })
 
 
+// Googleマップを開く
+function fn_open_map(lat, lon) {
 
+    if (lat !== null && lon !== null
+        && lat !== '' && lon !== '') {
+        url = 'https://www.google.co.jp/maps/?q=' + lat + ',' + lon + '';
+        window.open(url, '_blank');
+    }
+}
 
 
 
