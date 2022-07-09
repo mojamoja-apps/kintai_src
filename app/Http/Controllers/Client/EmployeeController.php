@@ -132,6 +132,10 @@ class EmployeeController extends Controller
     // 表示順更新処理
     public function orderupdate(Request $request) {
 
+        if ($request->input('ids') === null) {
+            return redirect( route('client.employee.index') );
+        }
+
         foreach ($request->input('ids') as $key => $id) {
             $updarr = [
                 'order' => $key+1,

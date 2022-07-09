@@ -121,9 +121,29 @@
                             </div>
 
                         </div>
+
+
+                        @if ($dakokukey == config('const.dakokumode.syukkin'))
+                        {{-- 初回のみ表示 --}}
                         <div class="form-group">
                             <code>9時半の場合「0930」と4桁の数字で入力してください。</code>
                         </div>
+                        @endif
+
+
+                        @if ($dakokukey == config('const.dakokumode.taikin'))
+                        <div class="form-group">
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="midnight" name="midnight" value="1"
+                                    @if ((int)old('midnight') == 1) checked
+                                    @elseif ($kintai->midnight == 1) checked
+                                    {{-- @elseif ($mode == config('const.editmode.create')) checked --}}
+                                    @endif
+                                >
+                                    <label class="custom-control-label" for="midnight">深夜残業の場合チェックの上、2時半退勤なら「0230」と入力してください。</label>
+                            </div>
+                        </div>
+                        @endif
 
                         @if (Auth::user()->gps == true)
                         <div class="form-group">
@@ -174,4 +194,4 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/i18n/jquery.ui.datepicker-ja.min.js"></script>
 
 
-<@stop
+@stop

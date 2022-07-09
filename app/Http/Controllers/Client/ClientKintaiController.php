@@ -35,6 +35,12 @@ class ClientKintaiController extends Controller
         $collapse = config('const.COLLAPSE.CLOSE');
     }
 
+
+    // 打刻画面へリダイレクト
+    public function open() {
+        return redirect( route('kintai.index',['hash' => Auth::user()->hash]) );
+    }
+
     public function index(Request $request) {
         // cardの開閉 全閉じ状態を初期値 必要に応じてオープン
         $collapse = config('const.COLLAPSE.CLOSE');
@@ -162,10 +168,6 @@ class ClientKintaiController extends Controller
             config('const.max_get')
         )->get();
 
-//   foreach ($kintais as $key => $kintai) {
-//   dd($kintai);
-//       # code...
-//   }
         return view('client/kintai/index', compact('kintais', 'search', 'collapse', 'employees'));
     }
 
@@ -245,6 +247,11 @@ class ClientKintaiController extends Controller
             $time_6 = substr($request->input('time_6'), 0, 2) . ':' . substr($request->input('time_6'), 2, 2);
         }
 
+        // 前日分の退勤として打刻する
+        $midnight = 0;
+        if ($request->input('midnight')) {
+            $midnight = 1;
+        }
 
         $updarr = [
             'day' => $request->input('day'),
@@ -274,6 +281,7 @@ class ClientKintaiController extends Controller
             'lon_4' => $request->input('lon_4'),
             'lon_5' => $request->input('lon_5'),
             'lon_6' => $request->input('lon_6'),
+            'midnight' => $midnight,
         ];
 
         $result = Kintai::updateOrCreate(
@@ -413,48 +421,251 @@ class ClientKintaiController extends Controller
 
         // ヘッダーセット
         $row = 1;
-        $sheet->setCellValue("A{$row}", '日付');
-        $sheet->setCellValue("B{$row}", '社員コード');
-        $sheet->setCellValue("C{$row}", '氏名');
-        $sheet->setCellValue("D{$row}", '勤務時間');
-        $sheet->setCellValue("E{$row}", config('const.dakokunames_rest_1.1'));
+        $celindex = 1;
 
+        $col = Coordinate::stringFromColumnIndex($celindex++);
+        $sheet->setCellValue("{$col}{$row}", '日付');
+        $col = Coordinate::stringFromColumnIndex($celindex++);
+        $sheet->setCellValue("{$col}{$row}", '社員コード');
+        $col = Coordinate::stringFromColumnIndex($celindex++);
+        $sheet->setCellValue("{$col}{$row}", '氏名');
+        $col = Coordinate::stringFromColumnIndex($celindex++);
+        $sheet->setCellValue("{$col}{$row}", '勤務時間');
+        $col = Coordinate::stringFromColumnIndex($celindex++);
+        $sheet->setCellValue("{$col}{$row}", config('const.dakokunames_rest_1.1'));
+        $col = Coordinate::stringFromColumnIndex($celindex++);
+        $sheet->setCellValue("{$col}{$row}", "備考");
+        if (Auth::user()->gps == 1) {
+            $col = Coordinate::stringFromColumnIndex($celindex++);
+            $sheet->setCellValue("{$col}{$row}", "緯度");
+            $col = Coordinate::stringFromColumnIndex($celindex++);
+            $sheet->setCellValue("{$col}{$row}", "経度");
+        }
 
         if (Auth::user()->rest == 1) {
-            $sheet->setCellValue("F{$row}", config('const.dakokunames_rest_1.6'));
+            $col = Coordinate::stringFromColumnIndex($celindex++);
+            $sheet->setCellValue("{$col}{$row}", config('const.dakokunames_rest_1.6'));
+            $col = Coordinate::stringFromColumnIndex($celindex++);
+            $sheet->setCellValue("{$col}{$row}", "備考");
+            if (Auth::user()->gps == 1) {
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", "緯度");
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", "経度");
+            }
         } else if (Auth::user()->rest == 2) {
-            $sheet->setCellValue("F{$row}", config('const.dakokunames_rest_2.2'));
-            $sheet->setCellValue("G{$row}", config('const.dakokunames_rest_2.3'));
-            $sheet->setCellValue("H{$row}", config('const.dakokunames_rest_2.6'));
+            $col = Coordinate::stringFromColumnIndex($celindex++);
+            $sheet->setCellValue("{$col}{$row}", config('const.dakokunames_rest_2.2'));
+            $col = Coordinate::stringFromColumnIndex($celindex++);
+            $sheet->setCellValue("{$col}{$row}", "備考");
+            if (Auth::user()->gps == 1) {
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", "緯度");
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", "経度");
+            }
+
+            $col = Coordinate::stringFromColumnIndex($celindex++);
+            $sheet->setCellValue("{$col}{$row}", config('const.dakokunames_rest_2.3'));
+            $col = Coordinate::stringFromColumnIndex($celindex++);
+            $sheet->setCellValue("{$col}{$row}", "備考");
+            if (Auth::user()->gps == 1) {
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", "緯度");
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", "経度");
+            }
+
+            $col = Coordinate::stringFromColumnIndex($celindex++);
+            $sheet->setCellValue("{$col}{$row}", config('const.dakokunames_rest_2.6'));
+            $col = Coordinate::stringFromColumnIndex($celindex++);
+            $sheet->setCellValue("{$col}{$row}", "備考");
+            if (Auth::user()->gps == 1) {
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", "緯度");
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", "経度");
+            }
         } else if (Auth::user()->rest == 3) {
-            $sheet->setCellValue("F{$row}", config('const.dakokunames_rest_3.2'));
-            $sheet->setCellValue("G{$row}", config('const.dakokunames_rest_3.3'));
-            $sheet->setCellValue("H{$row}", config('const.dakokunames_rest_3.4'));
-            $sheet->setCellValue("I{$row}", config('const.dakokunames_rest_3.5'));
-            $sheet->setCellValue("J{$row}", config('const.dakokunames_rest_3.6'));
+            $col = Coordinate::stringFromColumnIndex($celindex++);
+            $sheet->setCellValue("{$col}{$row}", config('const.dakokunames_rest_3.2'));
+            $col = Coordinate::stringFromColumnIndex($celindex++);
+            $sheet->setCellValue("{$col}{$row}", "備考");
+            if (Auth::user()->gps == 1) {
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", "緯度");
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", "経度");
+            }
+
+            $col = Coordinate::stringFromColumnIndex($celindex++);
+            $sheet->setCellValue("{$col}{$row}", config('const.dakokunames_rest_3.3'));
+            $col = Coordinate::stringFromColumnIndex($celindex++);
+            $sheet->setCellValue("{$col}{$row}", "備考");
+            if (Auth::user()->gps == 1) {
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", "緯度");
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", "経度");
+            }
+
+            $col = Coordinate::stringFromColumnIndex($celindex++);
+            $sheet->setCellValue("{$col}{$row}", config('const.dakokunames_rest_3.4'));
+            $col = Coordinate::stringFromColumnIndex($celindex++);
+            $sheet->setCellValue("{$col}{$row}", "備考");
+            if (Auth::user()->gps == 1) {
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", "緯度");
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", "経度");
+            }
+
+            $col = Coordinate::stringFromColumnIndex($celindex++);
+            $sheet->setCellValue("{$col}{$row}", config('const.dakokunames_rest_3.5'));
+            $col = Coordinate::stringFromColumnIndex($celindex++);
+            $sheet->setCellValue("{$col}{$row}", "備考");
+            if (Auth::user()->gps == 1) {
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", "緯度");
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", "経度");
+            }
+
+            $col = Coordinate::stringFromColumnIndex($celindex++);
+            $sheet->setCellValue("{$col}{$row}", config('const.dakokunames_rest_3.6'));
+            $col = Coordinate::stringFromColumnIndex($celindex++);
+            $sheet->setCellValue("{$col}{$row}", "備考");
+            if (Auth::user()->gps == 1) {
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", "緯度");
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", "経度");
+            }
         }
 
         // Excel2行目からスタート
         $row = 2;
         foreach ($kintais as $kintai) {
+            $celindex = 1;
 
-            $sheet->setCellValue("A{$row}", $kintai->day->format('Y/m/d'));
-            $sheet->setCellValue("B{$row}", $kintai->employee->code);
-            $sheet->setCellValue("C{$row}", $kintai->employee->name);
-            $sheet->setCellValue("D{$row}", $kintai->work_hour);
-            $sheet->setCellValue("E{$row}", $kintai->time_1 !== null ? $kintai->time_1->format('H:i') : '');
+            $col = Coordinate::stringFromColumnIndex($celindex++);
+            $sheet->setCellValue("{$col}{$row}", $kintai->day->format('Y/m/d'));
+            $col = Coordinate::stringFromColumnIndex($celindex++);
+            $sheet->setCellValue("{$col}{$row}", $kintai->employee->code);
+            $col = Coordinate::stringFromColumnIndex($celindex++);
+            $sheet->setCellValue("{$col}{$row}", $kintai->employee->name);
+            $col = Coordinate::stringFromColumnIndex($celindex++);
+            $sheet->setCellValue("{$col}{$row}", $kintai->work_hour);
+            $col = Coordinate::stringFromColumnIndex($celindex++);
+            $sheet->setCellValue("{$col}{$row}", $kintai->time_1 !== null ? $kintai->time_1->format('H:i') : '');
+            $col = Coordinate::stringFromColumnIndex($celindex++);
+            $sheet->setCellValue("{$col}{$row}", $kintai->memo_1);
+            if (Auth::user()->gps == 1) {
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", $kintai->lat_1);
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", $kintai->lon_1);
+            }
+
             if (Auth::user()->rest == 1) {
-                $sheet->setCellValue("F{$row}", $kintai->time_6 !== null ? $kintai->time_6->format('H:i') : '');
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", $kintai->time_6 !== null ? $kintai->time_6->format('H:i') : '');
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", $kintai->memo_6);
+                if (Auth::user()->gps == 1) {
+                    $col = Coordinate::stringFromColumnIndex($celindex++);
+                    $sheet->setCellValue("{$col}{$row}", $kintai->lat_6);
+                    $col = Coordinate::stringFromColumnIndex($celindex++);
+                    $sheet->setCellValue("{$col}{$row}", $kintai->lon_6);
+                }
             } else if (Auth::user()->rest == 2) {
-                $sheet->setCellValue("F{$row}", $kintai->time_2 !== null ? $kintai->time_2->format('H:i') : '');
-                $sheet->setCellValue("G{$row}", $kintai->time_3 !== null ? $kintai->time_3->format('H:i') : '');
-                $sheet->setCellValue("H{$row}", $kintai->time_6 !== null ? $kintai->time_6->format('H:i') : '');
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", $kintai->time_2 !== null ? $kintai->time_2->format('H:i') : '');
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", $kintai->memo_2);
+                if (Auth::user()->gps == 1) {
+                    $col = Coordinate::stringFromColumnIndex($celindex++);
+                    $sheet->setCellValue("{$col}{$row}", $kintai->lat_2);
+                    $col = Coordinate::stringFromColumnIndex($celindex++);
+                    $sheet->setCellValue("{$col}{$row}", $kintai->lon_2);
+                }
+
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", $kintai->time_3 !== null ? $kintai->time_3->format('H:i') : '');
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", $kintai->memo_3);
+                if (Auth::user()->gps == 1) {
+                    $col = Coordinate::stringFromColumnIndex($celindex++);
+                    $sheet->setCellValue("{$col}{$row}", $kintai->lat_3);
+                    $col = Coordinate::stringFromColumnIndex($celindex++);
+                    $sheet->setCellValue("{$col}{$row}", $kintai->lon_3);
+                }
+
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", $kintai->time_6 !== null ? $kintai->time_6->format('H:i') : '');
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", $kintai->memo_6);
+                if (Auth::user()->gps == 1) {
+                    $col = Coordinate::stringFromColumnIndex($celindex++);
+                    $sheet->setCellValue("{$col}{$row}", $kintai->lat_6);
+                    $col = Coordinate::stringFromColumnIndex($celindex++);
+                    $sheet->setCellValue("{$col}{$row}", $kintai->lon_6);
+                }
             } else if (Auth::user()->rest == 3) {
-                $sheet->setCellValue("F{$row}", $kintai->time_2 !== null ? $kintai->time_2->format('H:i') : '');
-                $sheet->setCellValue("G{$row}", $kintai->time_3 !== null ? $kintai->time_3->format('H:i') : '');
-                $sheet->setCellValue("H{$row}", $kintai->time_4 !== null ? $kintai->time_4->format('H:i') : '');
-                $sheet->setCellValue("I{$row}", $kintai->time_5 !== null ? $kintai->time_5->format('H:i') : '');
-                $sheet->setCellValue("J{$row}", $kintai->time_6 !== null ? $kintai->time_6->format('H:i') : '');
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", $kintai->time_2 !== null ? $kintai->time_2->format('H:i') : '');
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", $kintai->memo_2);
+                if (Auth::user()->gps == 1) {
+                    $col = Coordinate::stringFromColumnIndex($celindex++);
+                    $sheet->setCellValue("{$col}{$row}", $kintai->lat_2);
+                    $col = Coordinate::stringFromColumnIndex($celindex++);
+                    $sheet->setCellValue("{$col}{$row}", $kintai->lon_2);
+                }
+
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", $kintai->time_3 !== null ? $kintai->time_3->format('H:i') : '');
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", $kintai->memo_3);
+                if (Auth::user()->gps == 1) {
+                    $col = Coordinate::stringFromColumnIndex($celindex++);
+                    $sheet->setCellValue("{$col}{$row}", $kintai->lat_3);
+                    $col = Coordinate::stringFromColumnIndex($celindex++);
+                    $sheet->setCellValue("{$col}{$row}", $kintai->lon_3);
+                }
+
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", $kintai->time_4 !== null ? $kintai->time_4->format('H:i') : '');
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", $kintai->memo_4);
+                if (Auth::user()->gps == 1) {
+                    $col = Coordinate::stringFromColumnIndex($celindex++);
+                    $sheet->setCellValue("{$col}{$row}", $kintai->lat_4);
+                    $col = Coordinate::stringFromColumnIndex($celindex++);
+                    $sheet->setCellValue("{$col}{$row}", $kintai->lon_4);
+                }
+
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", $kintai->time_5 !== null ? $kintai->time_5->format('H:i') : '');
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", $kintai->memo_5);
+                if (Auth::user()->gps == 1) {
+                    $col = Coordinate::stringFromColumnIndex($celindex++);
+                    $sheet->setCellValue("{$col}{$row}", $kintai->lat_5);
+                    $col = Coordinate::stringFromColumnIndex($celindex++);
+                    $sheet->setCellValue("{$col}{$row}", $kintai->lon_5);
+                }
+
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", $kintai->time_6 !== null ? $kintai->time_6->format('H:i') : '');
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", $kintai->memo_6);
+                if (Auth::user()->gps == 1) {
+                    $col = Coordinate::stringFromColumnIndex($celindex++);
+                    $sheet->setCellValue("{$col}{$row}", $kintai->lat_6);
+                    $col = Coordinate::stringFromColumnIndex($celindex++);
+                    $sheet->setCellValue("{$col}{$row}", $kintai->lon_6);
+                }
             }
             $row++;
         }

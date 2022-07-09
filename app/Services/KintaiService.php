@@ -23,6 +23,7 @@ class KintaiService
 
 
         $kintai->work_hour = 0;
+        $kintai->rest_hour = 0;
         if (
             $kintai->time_1 !== NULL
             && $kintai->time_6 !== NULL
@@ -66,6 +67,7 @@ class KintaiService
             $work_hour = reitengo_floor($minutes / 60);   // 勤務時間は0.5ごとに切り捨て
 
             $kintai->work_hour = $work_hour - $rest_1_hour - $rest_2_hour;
+            $kintai->rest_hour = $rest_1_hour + $rest_2_hour;
             // $kintai['hourfull'] = $work_hour;
             // $kintai['hour1'] = $rest_1_hour;
             // $kintai['hour2'] = $rest_2_hour;

@@ -183,7 +183,7 @@
                                 <input type="checkbox" class="custom-control-input" id="midnight" name="midnight" value="1"
                                     @if ((int)old('midnight') == 1) checked
                                     @elseif ($client->midnight == 1) checked
-                                    @elseif ($mode == config('const.editmode.create')) checked
+                                    {{-- @elseif ($mode == config('const.editmode.create')) checked --}}
                                     @endif
                                 >
                                     <label class="custom-control-label" for="midnight">深夜残業 (前日分の退勤として打刻する チェックを表示)</label>
@@ -196,7 +196,7 @@
                                 <input type="checkbox" class="custom-control-input" id="smile_csv" name="smile_csv" value="1"
                                     @if ((int)old('smile_csv') == 1) checked
                                     @elseif ($client->smile_csv == 1) checked
-                                    @elseif ($mode == config('const.editmode.create')) checked
+                                    {{-- @elseif ($mode == config('const.editmode.create')) checked --}}
                                     @endif
                                 >
                                     <label class="custom-control-label" for="smile_csv">スマイル用csv出力利用</label>
@@ -229,4 +229,4 @@
 <script src="{{ asset( cacheBusting('js/common.js') ) }}"></script>
 <script src="{{ asset( cacheBusting('js/admin/client.js') ) }}"></script>
 <script src="https://yubinbango.github.io/yubinbango/yubinbango.js" charset="UTF-8"></script>
-<@stop
+@stop

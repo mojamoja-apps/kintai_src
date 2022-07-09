@@ -1,9 +1,9 @@
 @extends('adminlte::page')
 
-@section('title', '勤怠データDL')
+@section('title', '勤怠データダウンロード')
 
 @section('content_header')
-    <h1>勤怠データDL</h1>
+    <h1>勤怠データダウンロード</h1>
 @stop
 
 @section('content')
@@ -35,7 +35,9 @@
 
                     <div class="card-footer">
                         <button type="button" id="" data-mode="excel" class="commit_btn btn btn-primary">Excel形式出力</button>
+                        @if (Auth::user()->smile_csv == true)
                         <button type="button" id="" data-mode="smile_csv" class="commit_btn btn btn-info">スマイル形式CSV出力</button>
+                        @endif
                         <p><code>ダウンロードまでに時間がかかりますが一度だけクリックしてお待ちください。</code></p>
                     </div>
 

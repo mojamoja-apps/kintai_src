@@ -246,6 +246,13 @@ return [
             'url'  => 'client/dl',
             'icon' => 'fas fa-fw fa-table',
         ],
+        ['header' => '　'],
+        [
+            'text' => '打刻画面',
+            'url'  => 'client/open',
+            'icon' => 'fas fa-fw fa-external-link-alt',
+            'target' => '_blank',
+        ],
     ],
 
     /*

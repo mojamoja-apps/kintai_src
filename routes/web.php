@@ -68,6 +68,9 @@ Route::middleware( ['auth'])->group(function () {
     Route::post('/client/dl/excel', [ClientKintaiController::class, 'excel'])->name('client.kintai.excel');
     Route::post('/client/dl/smilecsv', [ClientKintaiController::class, 'smilecsv'])->name('client.kintai.smilecsv');
 
+    // 打刻画面を開くリンク
+    Route::get('/client/open', [ClientKintaiController::class, 'open'])->name('client.kintai.open');
+
 
 });
 

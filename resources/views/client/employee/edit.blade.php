@@ -94,4 +94,4 @@
 <script src="{{ asset( cacheBusting('js/client/employee.js') ) }}"></script>
 </script>
 
-<@stop
+@stop
