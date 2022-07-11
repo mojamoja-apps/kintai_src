@@ -50,7 +50,7 @@ Route::middleware( ['auth'])->group(function () {
     Route::get('/client', function () {
         return view('client/index');
     })->name('client');
-    // 社員マスタ
+    // 従業員マスタ
     Route::match(['get', 'post'], '/client/employee', [EmployeeController::class, 'index'])->name('client.employee.index');
     Route::get('/client/employee/edit/{id?}', [EmployeeController::class, 'edit'])->name('client.employee.edit');
     Route::post('/client/employee/update/{id?}', [EmployeeController::class, 'update'])->name('client.employee.update');

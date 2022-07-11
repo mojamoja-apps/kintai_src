@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class ClientValidateController extends Controller
 {
     // 勤怠打刻の重複チェック
-    // クライアントID、社員ID、日付、勤怠ID(編集か新規か)
+    // クライアントID、従業員ID、日付、勤怠ID(編集か新規か)
     public function kintai(Request $request) {
 
         $query = Kintai::query();

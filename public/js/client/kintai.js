@@ -77,7 +77,7 @@ $(function(){
             matcher: twoSearch
         });
     } else {
-        // 編集モード時 社員は変更できない
+        // 編集モード時 従業員は変更できない
         // 選択SELECT以外は選択不可にする
         $('select[readonly] option').each(function(index) {
             if ($(this).prop("selected") == false) {

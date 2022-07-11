@@ -45,7 +45,7 @@ class ClientKintaiController extends Controller
         // cardの開閉 全閉じ状態を初期値 必要に応じてオープン
         $collapse = config('const.COLLAPSE.CLOSE');
 
-        // クライアントIDを元に社員一覧
+        // クライアントIDを元に従業員一覧
         $employeeService = New EmployeeService();
         $employees = $employeeService->findEmployeesByClientId(Auth::id());
 
@@ -61,7 +61,7 @@ class ClientKintaiController extends Controller
         );
         $query->where('kintais.client_id', Auth::id());
 
-        // 社員の並び順にしたいので社員マスタをjoin
+        // 従業員の並び順にしたいので従業員マスタをjoin
         $query->leftJoin('employees', 'kintais.employee_id', '=', 'employees.id');
 
         //検索
@@ -189,7 +189,7 @@ class ClientKintaiController extends Controller
         }
 
 
-        // クライアントIDを元に社員一覧
+        // クライアントIDを元に従業員一覧
         $employeeService = New EmployeeService();
         $employees = $employeeService->findEmployeesByClientId(Auth::id());
 
@@ -371,9 +371,6 @@ class ClientKintaiController extends Controller
         $end = $dt->endOfMonth()->toDateString();
 
 
-        // $workers = Worker::where('style', '=', '1')->orderBy('id', 'asc')->get();  // 1:正社員
-        // $parts = Worker::where('style', '=', '2')->orderBy('id', 'asc')->get();  // 2:実習生
-
         // セッションを一旦消して検索値を保存
         $session = $request->session()->get('kintai');
         $search = [];
@@ -398,7 +395,7 @@ class ClientKintaiController extends Controller
         );
         $query->where('kintais.client_id', Auth::id());
 
-        // 社員の並び順にしたいので社員マスタをjoin
+        // 従業員の並び順にしたいので従業員マスタをjoin
         $query->leftJoin('employees', 'kintais.employee_id', '=', 'employees.id');
 
         $query->whereDate('day', '>=', $start);
@@ -426,7 +423,7 @@ class ClientKintaiController extends Controller
         $col = Coordinate::stringFromColumnIndex($celindex++);
         $sheet->setCellValue("{$col}{$row}", '日付');
         $col = Coordinate::stringFromColumnIndex($celindex++);
-        $sheet->setCellValue("{$col}{$row}", '社員コード');
+        $sheet->setCellValue("{$col}{$row}", '従業員コード');
         $col = Coordinate::stringFromColumnIndex($celindex++);
         $sheet->setCellValue("{$col}{$row}", '氏名');
         $col = Coordinate::stringFromColumnIndex($celindex++);
@@ -732,7 +729,7 @@ class ClientKintaiController extends Controller
         );
         $query->where('kintais.client_id', Auth::id());
 
-        // 社員の並び順にしたいので社員マスタをjoin
+        // 従業員の並び順にしたいので従業員マスタをjoin
         $query->leftJoin('employees', 'kintais.employee_id', '=', 'employees.id');
 
         $query->whereDate('day', '>=', $start);
@@ -741,7 +738,7 @@ class ClientKintaiController extends Controller
         $kintais = $query->orderBy('order', 'ASC')->get();
 
         // カラムの作成
-        $head = ['社員コード', '年度', '給与賞与区分', '支給月', '勤怠項目1'];
+        $head = ['従業員コード', '年度', '給与賞与区分', '支給月', '勤怠項目1'];
 
         $stream = fopen('php://temp', 'w');
         $data = [];

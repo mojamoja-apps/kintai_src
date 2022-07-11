@@ -46,7 +46,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>社員</label>
+                                    <label>従業員</label>
                                     <select name="employee_id" id="employee_id" class="form-control select2" style="width: 100%;">
                                         <option value="" data-sub-search="">氏名・ふりがなで絞込</option>
 @foreach($employees as $employee)

@@ -1,9 +1,9 @@
 @extends('adminlte::page')
 
-@section('title', '社員編集')
+@section('title', '従業員編集')
 
 @section('content_header')
-    <h1>社員編集</h1>
+    <h1>従業員編集</h1>
 @stop
 
 @section('content')
@@ -23,7 +23,7 @@
 
                     <div class="card-body">
                         <div class="form-group">
-                            <label for="code">社員コード</label>
+                            <label for="code">従業員コード</label>
                             <input type="text" class="form-control" name="code" id="code" placeholder="ABC12345" maxlength="8" value="{{ old('code', $employee->code) }}">
                             @if ($errors->has('code'))
                             <code>{{ $errors->first('code') }}</code>

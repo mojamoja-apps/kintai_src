@@ -18,15 +18,15 @@ return new class extends Migration
             $table->unsignedBigInteger('client_id')->nullable()->comment('企業ID');
             $table->foreign('client_id')->references('id')->on('clients')->onUpdate('CASCADE')->onDelete('SET NULL');
             $table->boolean('is_enabled')->default(false)->comment('有効無効');
-            $table->string('code')->nullable()->comment('社員コード');
-            $table->string('name')->nullable()->comment('社員名');
-            $table->string('kana')->nullable()->comment('社員名かな');
+            $table->string('code')->nullable()->comment('従業員コード');
+            $table->string('name')->nullable()->comment('従業員名');
+            $table->string('kana')->nullable()->comment('従業員名かな');
             $table->text('memo')->nullable()->comment('メモ');
             $table->integer('order')->unsigned()->default(999999)->comment('表示順');
             $table->timestamps();
         });
 
-        DB::statement("ALTER TABLE employees COMMENT '社員';");
+        DB::statement("ALTER TABLE employees COMMENT '従業員';");
     }
 
     /**

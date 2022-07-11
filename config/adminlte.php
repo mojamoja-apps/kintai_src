@@ -231,7 +231,7 @@ return [
         // Navbar items:
         ['header' => 'マスター設定'],
         [
-            'text' => '社員管理',
+            'text' => '従業員管理',
             'url'  => 'client/employee',
             'icon' => 'fas fa-fw fa-user',
         ],

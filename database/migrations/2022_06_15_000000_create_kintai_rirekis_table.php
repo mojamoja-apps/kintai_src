@@ -19,7 +19,7 @@ return new class extends Migration
             $table->date('day')->nullable()->comment('日');
             $table->unsignedBigInteger('client_id')->comment('企業ID');
             $table->foreign('client_id')->references('id')->on('clients')->onUpdate('CASCADE')->onDelete('CASCADE');
-            $table->unsignedBigInteger('employee_id')->comment('社員ID');
+            $table->unsignedBigInteger('employee_id')->comment('従業員ID');
             $table->foreign('employee_id')->references('id')->on('employees')->onUpdate('CASCADE')->onDelete('CASCADE');
             $table->time("time")->nullable()->comment("勤務開始");
             $table->boolean('midnight')->default(false)->comment('深夜残業 前日分の退勤として打刻チェック');

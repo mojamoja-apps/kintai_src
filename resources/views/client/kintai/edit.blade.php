@@ -44,7 +44,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="code">社員</label>
+                            <label for="code">従業員</label>
                             <select name="employee_id" id="employee_id" class="form-control select2"
                             @if ($mode == config('const.editmode.edit'))
                             readonly

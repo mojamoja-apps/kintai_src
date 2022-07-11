@@ -18,7 +18,7 @@ return new class extends Migration
             $table->date('day')->nullable()->comment('日');
             $table->unsignedBigInteger('client_id')->comment('企業ID');
             $table->foreign('client_id')->references('id')->on('clients')->onUpdate('CASCADE')->onDelete('CASCADE');
-            $table->unsignedBigInteger('employee_id')->comment('社員ID');
+            $table->unsignedBigInteger('employee_id')->comment('従業員ID');
             $table->foreign('employee_id')->references('id')->on('employees')->onUpdate('CASCADE')->onDelete('CASCADE');
             $table->time("time_1")->nullable()->comment("勤務開始");
             $table->time("time_2")->nullable()->comment("休憩開始1");

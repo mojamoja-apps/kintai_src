@@ -8,7 +8,7 @@ class EmployeeService
 {
 
     /*
-        * クライアントIDで絞った有効社員一覧
+        * クライアントIDで絞った有効従業員一覧
     */
     public function findEmployeesByClientId($client_id)
     {

@@ -57,11 +57,10 @@ class FrontKintaiController extends Controller
         // basic認証
         fn_basic_auth(array($client->basic_user => $client->basic_pass));
 
-        // クライアントIDを元に社員一覧
+        // クライアントIDを元に従業員一覧
         $employeeService = New EmployeeService();
         $employees = $employeeService->findEmployeesByClientId($client->id);
 
-        // 社員マスタ取得
         config(['adminlte.title' => '']);
         config(['adminlte.logo' => '']);
         return view('kintai.index', compact('client', 'employees'));
