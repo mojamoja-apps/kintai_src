@@ -69,3 +69,33 @@ function reitengo_floor($num) {
 function reitengo_ceil($num) {
     return ceil($num * 2) /2;
 }
+
+/**
+* 勤務時間数 0.25単位で切り捨て
+  4倍して小数点以下切り捨て、割る4
+  8.1→8
+  7.9→7.75
+  7.4→7.25
+  1.6→1.5
+*
+* @param number 切り捨て対象数値
+* @return number 切り捨て後数値
+*/
+function reitennigo_floor($num) {
+    return floor($num * 4) /4;
+}
+
+/**
+* 休憩時間数 0.25単位で切り上げ
+  4倍して小数点以下切り上げ、割る4
+  8.1→8.25
+  7.9→8
+  7.4→7.5
+  1.6→1.75
+*
+* @param number 切り上げ対象数値
+* @return number 切り上げ後数値
+*/
+function reitennigo_ceil($num) {
+    return ceil($num * 4) /4;
+}
