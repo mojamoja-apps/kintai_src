@@ -24,6 +24,7 @@ class KintaiService
 
         $kintai->work_hour = 0;
         $kintai->rest_hour = 0;
+        $kintai->zangyo_hour = 0;
         if (
             $kintai->time_1 !== NULL
             && $kintai->time_6 !== NULL
@@ -68,6 +69,13 @@ class KintaiService
 
             $kintai->work_hour = $work_hour - $rest_1_hour - $rest_2_hour;
             $kintai->rest_hour = $rest_1_hour + $rest_2_hour;
+
+            // 残業時間 勤務時間マイナス勤務時間上限値
+            $zangyo = $kintai->work_hour - $client->kinmu_limit_hour;
+            if ($zangyo < 0) {
+                $zangyo = 0;
+            }
+            $kintai->zangyo_hour = $zangyo;
             // $kintai['hourfull'] = $work_hour;
             // $kintai['hour1'] = $rest_1_hour;
             // $kintai['hour2'] = $rest_2_hour;

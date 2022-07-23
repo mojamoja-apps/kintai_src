@@ -428,6 +428,10 @@ class ClientKintaiController extends Controller
         $sheet->setCellValue("{$col}{$row}", '氏名');
         $col = Coordinate::stringFromColumnIndex($celindex++);
         $sheet->setCellValue("{$col}{$row}", '勤務時間');
+        if (Auth::user()->zangyo_flg) {
+            $col = Coordinate::stringFromColumnIndex($celindex++);
+            $sheet->setCellValue("{$col}{$row}", '残業時間');
+        }
         $col = Coordinate::stringFromColumnIndex($celindex++);
         $sheet->setCellValue("{$col}{$row}", config('const.dakokunames_rest_1.1'));
         $col = Coordinate::stringFromColumnIndex($celindex++);
@@ -553,6 +557,10 @@ class ClientKintaiController extends Controller
             $sheet->setCellValue("{$col}{$row}", $kintai->employee->name);
             $col = Coordinate::stringFromColumnIndex($celindex++);
             $sheet->setCellValue("{$col}{$row}", $kintai->work_hour);
+            if (Auth::user()->zangyo_flg) {
+                $col = Coordinate::stringFromColumnIndex($celindex++);
+                $sheet->setCellValue("{$col}{$row}", $kintai->zangyo_hour);
+            }
             $col = Coordinate::stringFromColumnIndex($celindex++);
             $sheet->setCellValue("{$col}{$row}", $kintai->time_1 !== null ? $kintai->time_1->format('H:i') : '');
             $col = Coordinate::stringFromColumnIndex($celindex++);
@@ -722,6 +730,7 @@ class ClientKintaiController extends Controller
             'employees.code',
             'employees.order',
             DB::raw('SUM(kintais.work_hour) as work_hour_sum'),
+            DB::raw('SUM(kintais.zangyo_hour) as zangyo_hour_sum'),
         );
         $query->groupBy(
             'employees.code',
@@ -739,6 +748,9 @@ class ClientKintaiController extends Controller
 
         // カラムの作成
         $head = ['従業員コード', '年度', '給与賞与区分', '支給月', '勤怠項目1'];
+        if (Auth::user()->zangyo_flg) {
+            $head[] = '残業時間';
+        }
 
         $stream = fopen('php://temp', 'w');
         $data = [];
@@ -751,6 +763,9 @@ class ClientKintaiController extends Controller
             $arr[] = '1';
             $arr[] = $month;
             $arr[] = $kintai->work_hour_sum;
+            if (Auth::user()->zangyo_flg) {
+                $arr[] = $kintai->zangyo_hour_sum;
+            }
             mb_convert_variables('SJIS-win', 'UTF-8', $arr);
             fputcsv($stream, $arr);
         }

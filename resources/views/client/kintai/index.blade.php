@@ -30,12 +30,18 @@
                                 <div class="form-group">
                                     <label>日付</label>
                                     <div class="form-inline">
-                                        <input type="text" class="form-control" name="day_st" id="day_st" placeholder="2022/01/01" value="{{ old('day_st', $search['day_st'] ) }}" style="width: 110px;">
+                                        <input type="text" class="form-control" name="day_st" id="day_st"
+                                        value="{{ old('day_st', $search['day_st'] ) }}"
+                                        autocomplete="off" placeholder="2022/01/01"
+                                        style="width: 110px;">
                                         <span class="input-group-append">
                                             <button type="button" class="btn btn-info btn-flat day_today_btn" >今日</button>
                                         </span>
                                         <span class="m-1">～</span>
-                                        <input type="text" class="form-control" name="day_ed" id="day_ed" placeholder="2022/12/31" value="{{ old('day_ed', $search['day_ed'] ) }}" style="width: 110px;">
+                                        <input type="text" class="form-control" name="day_ed" id="day_ed"
+                                        value="{{ old('day_ed', $search['day_ed'] ) }}"
+                                        autocomplete="off" placeholder="2022/12/31"
+                                        style="width: 110px;">
                                         <span class="input-group-append">
                                             <button type="button" class="btn btn-info btn-flat day_today_btn" >今日</button>
                                         </span>
@@ -116,6 +122,9 @@
                                 @endif
                                 <th>{{ config('const.dakokunames_rest_1.6') }}</th>
                                 <th>勤務時間</th>
+                                @if (Auth::user()->zangyo_flg)
+                                <th>内 残業時間</th>
+                                @endif
                                 <th></th>
                             </tr>
                         </thead>
@@ -140,6 +149,9 @@
                                 @endif
                                 <td>{{ $kintai->time_6 !== null ? $kintai->time_6->format('H:i') : '' }}</td>
                                 <td class="text-right">{{ $kintai->work_hour }}</td>
+                                @if (Auth::user()->zangyo_flg)
+                                <td class="text-right">{{ $kintai->zangyo_hour }}</td>
+                                @endif
                                 <td class="text-center">
                                     <button type="button" class="btn btn-primary" onclick="location.href='{{route('client.kintai.edit',['id' => $kintai->id])}}'">詳細</button>
                                     <button type="button" class="btn btn-danger delete_btn" onclick="deleteData('{{ route('client.kintai.destroy',['id' => $kintai->id]) }}');">削除</button>
