@@ -36,6 +36,10 @@ $('#edit_form').validate({
             required: true,
             maxlength: 10,
         },
+        kinmu_limit_hour: {
+            required: $('#zangyo_flg').prop("checked"),
+            max: 24,
+        },
     },
     messages: {
         name: {
@@ -61,6 +65,10 @@ $('#edit_form').validate({
         basic_pass: {
             required: "必須項目です。",
             maxlength: "8文字以下で入力してください。",
+        },
+        kinmu_limit_hour: {
+            required: "残業時間計算の場合、入力してください。",
+            max: "24以下で入力してください。",
         },
     },
     errorElement: 'span',
@@ -117,3 +125,17 @@ $('#delete_form').validate({
     }
 });
 
+$('#zangyo_flg').change(function (e) {
+    if ($(this).prop("checked")) {
+        $('.kinmu_limit_hour_box').show('slow');
+    } else {
+        $('.kinmu_limit_hour_box').hide('slow');
+    }
+});
+
+
+
+
+$(function(){
+    $('#zangyo_flg').change();
+})

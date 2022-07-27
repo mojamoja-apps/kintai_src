@@ -26,7 +26,9 @@
                         <div class="form-group">
                             <label for="name">日付</label>
                             <div class="input-group col-lg-4 col-md-5 col-sm-6">
-                                <input type="text" class="form-control" name="day" id="day" value="{{ old('day', ($kintai->day != null ? $kintai->day->format('Y/m/d') : '') ) }}"
+                                <input type="text" class="form-control" name="day" id="day"
+                                value="{{ old('day', ($kintai->day != null ? $kintai->day->format('Y/m/d') : '') ) }}"
+                                autocomplete="off"
                                 @if ($mode == config('const.editmode.edit'))
                                 readonly
                                 @endif

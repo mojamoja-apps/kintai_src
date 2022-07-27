@@ -118,11 +118,11 @@
 
                 <div class="card card-primary">
                     <div class="card-header">
-                        <h3 class="card-title">勤怠打刻ページ設定</h3>
+                        <h3 class="card-title">勤怠設定</h3>
                     </div>
                     <div class="card-body">
                         <div class="form-group">
-                            <label for="hash">URL用コード</label>
+                            <label for="hash">打刻ページ URL用コード</label>
                             <input type="text" class="form-control" name="hash" id="hash" placeholder="" maxlength="32" value="{{ old('hash', $client->hash) }}">
                             <p><code>自動発行されるので、基本的に変更する必要はありません。</code></p>
                             @if ($errors->has('hash'))
@@ -131,7 +131,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="basic_user">Basic認証 ユーザー</label>
+                            <label for="basic_user">打刻ページ Basic認証 ユーザー</label>
                             <input type="text" class="form-control" name="basic_user" id="basic_user" placeholder="" maxlength="10" value="{{ old('basic_user', $client->basic_user) }}">
                             @if ($errors->has('basic_user'))
                             <code>{{ $errors->first('basic_user') }}</code>
@@ -139,7 +139,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="basic_pass">Basic認証 パスワード</label>
+                            <label for="basic_pass">打刻ページ Basic認証 パスワード</label>
                             <input type="text" class="form-control" name="basic_pass" id="basic_pass" placeholder="" maxlength="10" value="{{ old('basic_pass', $client->basic_pass) }}">
                             @if ($errors->has('basic_pass'))
                             <code>{{ $errors->first('basic_pass') }}</code>
@@ -188,6 +188,29 @@
                                 >
                                     <label class="custom-control-label" for="midnight">深夜残業 (前日分の退勤として打刻する チェックを表示)</label>
                             </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="zangyo_flg" name="zangyo_flg" value="1"
+                                    @if ((int)old('zangyo_flg') == 1) checked
+                                    @elseif ($client->zangyo_flg == 1) checked
+                                    {{-- @elseif ($mode == config('const.editmode.create')) checked --}}
+                                    @endif
+                                >
+                                    <label class="custom-control-label" for="zangyo_flg">残業時間計算</label>
+                            </div>
+                        </div>
+                        <div class="form-group kinmu_limit_hour_box">
+                            <label for="kinmu_limit_hour">勤務時間上限 この時間以上は残業扱い</label>
+                            <input type="number" class="form-control" name="kinmu_limit_hour"
+                            id="kinmu_limit_hour"
+                            value="{{ old('kinmu_limit_hour', $client->kinmu_limit_hour) }}"
+                            placeholder="8" max="24" style="width: 80px;">
+                            @if ($errors->has('kinmu_limit_hour'))
+                            <code>{{ $errors->first('kinmu_limit_hour') }}</code>
+                            @endif
                         </div>
 
 

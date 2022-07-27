@@ -202,6 +202,8 @@ class AdminClientController extends Controller
             'gps' => $gps,
             'rest' => $request->input('rest'),
             'midnight' => $midnight,
+            'zangyo_flg' => $request->input('zangyo_flg') ?? 0,
+            'kinmu_limit_hour' => $request->input('kinmu_limit_hour') ?? 0,
             'smile_csv' => $smile_csv,
         ];
         // パスワードの入力がある場合は更新対象に含める
