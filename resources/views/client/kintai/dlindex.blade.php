@@ -38,6 +38,10 @@
                         @if (Auth::user()->smile_csv == true)
                         <button type="button" id="" data-mode="smile_csv" class="commit_btn btn btn-info">スマイル形式CSV出力</button>
                         @endif
+                        @if ( in_array(Auth::id(), config('const.PLANETWORK_IDS'))
+                        || App::environment(['local', 'staging']) )
+                        <br><button type="button" id="" data-mode="planetwork_csv" class="commit_btn btn btn-info mt-2">プラネットワーク様用</button>
+                        @endif
                         <p><code>ダウンロードまでに時間がかかりますが一度だけクリックしてお待ちください。</code></p>
                     </div>
 
@@ -73,6 +77,8 @@ $(function(){
             ac = '{{ route('client.kintai.excel') }}';
         } else if ($(this).data('mode') == 'smile_csv') {
             ac = '{{ route('client.kintai.smilecsv') }}';
+        } else if ($(this).data('mode') == 'planetwork_csv') {
+            ac = '{{ route('client.kintai.planetworkcsv') }}';
         }
         $("#edit_form").attr('action', ac);
         $("#edit_form").submit();

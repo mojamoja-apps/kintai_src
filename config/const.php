@@ -95,6 +95,10 @@ display: block;
     ],
 
 
-
+    // プラネットワーク様ID 本番2
+    // 専用CSVダウンロード
+    'PLANETWORK_IDS' => [
+        2
+    ],
 
 ];
