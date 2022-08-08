@@ -136,18 +136,34 @@
                                         : '' }}</td>
                                 <td>{{ $kintai->employee->code }}</td>
                                 <td>{{ $kintai->employee->name }}</td>
-                                <td>{{ $kintai->time_1 !== null ? $kintai->time_1->format('H:i') : '' }}</td>
+                                <td class="{{ $kintai->time_1 == null ? 'bg-danger opacity-50' : '' }}">
+                                    {{ $kintai->time_1 !== null ? $kintai->time_1->format('H:i') : '' }}
+                                </td>
                                 @if (Auth::user()->rest == 2)
-                                <td>{{ $kintai->time_2 !== null ? $kintai->time_2->format('H:i') : '' }}</td>
-                                <td>{{ $kintai->time_3 !== null ? $kintai->time_3->format('H:i') : '' }}</td>
+                                <td class="{{ $kintai->time_2 == null ? 'bg-danger opacity-50' : '' }}">
+                                    {{ $kintai->time_2 !== null ? $kintai->time_2->format('H:i') : '' }}
+                                </td>
+                                <td class="{{ $kintai->time_3 == null ? 'bg-danger opacity-50' : '' }}">
+                                    {{ $kintai->time_3 !== null ? $kintai->time_3->format('H:i') : '' }}
+                                </td>
                                 @endif
                                 @if (Auth::user()->rest == 3)
-                                <td>{{ $kintai->time_2 !== null ? $kintai->time_2->format('H:i') : '' }}</td>
-                                <td>{{ $kintai->time_3 !== null ? $kintai->time_3->format('H:i') : '' }}</td>
-                                <td>{{ $kintai->time_4 !== null ? $kintai->time_4->format('H:i') : '' }}</td>
-                                <td>{{ $kintai->time_5 !== null ? $kintai->time_5->format('H:i') : '' }}</td>
+                                <td class="{{ $kintai->time_2 == null ? 'bg-danger opacity-50' : '' }}">
+                                    {{ $kintai->time_2 !== null ? $kintai->time_2->format('H:i') : '' }}
+                                </td>
+                                <td class="{{ $kintai->time_3 == null ? 'bg-danger opacity-50' : '' }}">
+                                    {{ $kintai->time_3 !== null ? $kintai->time_3->format('H:i') : '' }}
+                                </td>
+                                <td class="{{ $kintai->time_4 == null ? 'bg-danger opacity-50' : '' }}">
+                                    {{ $kintai->time_4 !== null ? $kintai->time_4->format('H:i') : '' }}
+                                </td>
+                                <td class="{{ $kintai->time_5 == null ? 'bg-danger opacity-50' : '' }}">
+                                    {{ $kintai->time_5 !== null ? $kintai->time_5->format('H:i') : '' }}
+                                </td>
                                 @endif
-                                <td>{{ $kintai->time_6 !== null ? $kintai->time_6->format('H:i') : '' }}</td>
+                                <td class="{{ $kintai->time_6 == null ? 'bg-danger opacity-50' : '' }}">
+                                    {{ $kintai->time_6 !== null ? $kintai->time_6->format('H:i') : '' }}
+                                </td>
                                 <td class="text-right">{{ $kintai->work_hour }}</td>
                                 @if (Auth::user()->zangyo_flg)
                                 <td class="text-right">{{ $kintai->zangyo_hour }}</td>
@@ -283,6 +299,7 @@ $('#datatable1').DataTable({
     "pageLength": 50,
     "searching": false,
     "ordering": true,
+    "order": [ [ 0, "desc" ] ],
     "info": true,
     "autoWidth": false,
     "responsive": true,
@@ -298,14 +315,5 @@ $('#datatable1').DataTable({
 
 
 
-
-$(function(){
-    // 打刻が無いセルの色を塗る
-    $.each($('.kintai_data_row td'), function (indexInArray, valueOfElement) {
-         if ($(this).text().trim() === '') {
-            $(this).addClass('bg-danger opacity-50');
-         }
-    });
-})
 </script>
 @stop
