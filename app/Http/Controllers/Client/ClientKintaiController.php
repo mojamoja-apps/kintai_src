@@ -729,8 +729,8 @@ class ClientKintaiController extends Controller
         $query->select(
             'employees.code',
             'employees.order',
-            DB::raw('SUM(kintais.work_hour) as work_hour_sum'),
-            DB::raw('SUM(kintais.zangyo_hour) as zangyo_hour_sum'),
+            DB::raw('SUM(kintais.work_hour) AS work_hour_sum'),
+            DB::raw('SUM(kintais.zangyo_hour) AS zangyo_hour_sum'),
         );
         $query->groupBy(
             'employees.code',
@@ -782,11 +782,116 @@ class ClientKintaiController extends Controller
             'Content-Type' => 'text/csv',
             'Content-Disposition' => "attachment; filename=smile_" . $year . sprintf('%02d', $month) . ".csv"
         ]);
-
-        //return view('user.index', compact('users'));
-
     }
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+    // プラネットワーク様用 独自形式csv
+    public function planetworkcsv(Request $request) {
+        $request->validate([
+            'year' => 'required',
+            'month' => 'required',
+        ]
+        ,[
+            'year.required' => '必須項目です。',
+            'month.required' => '必須項目です。',
+        ]);
+
+        $year = $request->input('year');
+        $month = $request->input('month');
+
+        // 月初・月末
+        $dt = new Carbon("{$year}/{$month}/01");
+        $start = $dt->startOfMonth()->toDateString();
+        $dt = new Carbon("{$year}/{$month}/01");
+        $end = $dt->endOfMonth()->toDateString();
+
+        // セッションを一旦消して検索値を保存
+        $session = $request->session()->get('kintai');
+        $search = [];
+        $search['year'] = $request->input('year');
+        $search['month'] = $request->input('month');
+        $request->session()->forget('kintai');
+        $request->session()->put('kintai',$search);
+
+
+
+
+
+
+        // 勤怠情報を取得
+        $query = Kintai::query();
+        $query->select(
+            'employees.code',
+            'employees.order',
+            DB::raw('SUM(kintais.work_hour) AS work_hour_sum'),
+            DB::raw('SUM(kintais.zangyo_hour) AS zangyo_hour_sum'),
+            DB::raw('COUNT(*) AS day_count'),
+            DB::raw("DAY(LAST_DAY('" . $start . "')) AS month_daycount"), // 指定月の日数
+        );
+        $query->groupBy(
+            'employees.code',
+            'employees.order',
+        );
+        $query->where('kintais.client_id', Auth::id());
+
+        // 従業員の並び順にしたいので従業員マスタをjoin
+        $query->leftJoin('employees', 'kintais.employee_id', '=', 'employees.id');
+
+        $query->whereDate('day', '>=', $start);
+        $query->whereDate('day', '<=', $end);
+
+        $kintais = $query->orderBy('order', 'ASC')->get();
+
+        // カラムの作成
+        $head = ['社員ｺｰﾄﾞ', '年度', '給与賞与区分', '支給月', '出勤日数', '欠勤日数', '有給日数', '休日日数', '所定就労日数', '勤務時間', '残業時間', '特別休暇'];
+
+        $stream = fopen('php://temp', 'w');
+        $data = [];
+        mb_convert_variables('SJIS-win', 'UTF-8', $head);
+        fputcsv($stream, $head);
+        foreach ($kintais as $kintai) {
+            $arr = [];
+            $arr[] = $kintai->code;
+            $arr[] = $year;
+            $arr[] = '1';
+            $arr[] = $month;
+            $arr[] = $kintai->day_count;
+            $arr[] = 0;
+            $arr[] = 0;
+            $arr[] = 0;
+            $arr[] = $kintai->month_daycount;
+            $arr[] = $kintai->work_hour_sum;
+            $arr[] = $kintai->zangyo_hour_sum;
+            $arr[] = 0;
+
+            mb_convert_variables('SJIS-win', 'UTF-8', $arr);
+            fputcsv($stream, $arr);
+        }
+        rewind($stream); //注意：fpassthru() する前にもファイルポインタは戻しておく
+
+        // ダウンロード完了でリダイレクト用クッキー
+        setcookie("downloaded", 1, time()+5);
+
+
+        return response()->stream(function () use ($stream) { //修正 2. ストリームのままCSV出力できるようにする
+            fpassthru($stream);
+            fclose($stream);
+        }, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=planetwork_" . $year . sprintf('%02d', $month) . ".csv"
+        ]);
+
+    }
 }
