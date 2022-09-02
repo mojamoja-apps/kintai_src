@@ -309,7 +309,10 @@ $('#datatable1').DataTable({
         { responsivePriority: 3, targets: 1 },
         { targets: -1, width: "120px" },
     ],
-    "buttons": ["csv"],
+    "buttons": [{
+        extend: 'csv',
+        bom: true,
+    }],
 }).buttons().container().appendTo('#datatable1_wrapper .col-md-6:eq(0)');
 
 
